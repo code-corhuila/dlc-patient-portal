@@ -1,0 +1,13 @@
+.patients-page {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.patients-page h1 {
+  margin: 0;
+}
+
+.patients-page p {
+  margin: 0;
+}
