@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "dlc-patients-portal": {
+    "dlc-patient-portal": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -31,7 +31,7 @@
               "index": false,
               "assets": [],
               "styles": [],
-              "outputPath": "dist/dlc-patients-portal/portal",
+              "outputPath": "dist/dlc-patient-portal/portal",
               "outputHashing": "all"
             },
             "production": {
@@ -61,10 +61,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "dlc-patients-portal:build:production"
+              "buildTarget": "dlc-patient-portal:build:production"
             },
             "development": {
-              "buildTarget": "dlc-patients-portal:build:development"
+              "buildTarget": "dlc-patient-portal:build:development"
             }
           },
           "defaultConfiguration": "development"
