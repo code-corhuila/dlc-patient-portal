@@ -1,5 +1,5 @@
 {
-  "name": "dlc-patients-portal",
+  "name": "dlc-patient-portal",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,7 +7,8 @@
     "build": "ng build",
     "build:portal": "ng build --configuration portal && node scripts/prepare-portal-entry.mjs",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:packaging": "node --test scripts/prepare-portal-entry.spec.mjs"
   },
   "prettier": {
     "printWidth": 100,

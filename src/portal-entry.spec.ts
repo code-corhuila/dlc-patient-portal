@@ -79,9 +79,13 @@ describe('HU-PAT-001 / ADR-011 mount lifecycle', () => {
   });
 
   it('cleans a mount cancelled while Angular application creation is pending', async () => {
+    const destroy = spyOn(ApplicationRef.prototype, 'destroy').and.callThrough();
+    const bootstrap = spyOn(ApplicationRef.prototype, 'bootstrap').and.callThrough();
     const pending = mount(host, context);
     controller.abort();
     await expectAsync(pending).toBeRejectedWithError('CANCELLED');
+    expect(destroy).toHaveBeenCalledTimes(1);
+    expect(bootstrap).not.toHaveBeenCalled();
     expect(host.childElementCount).toBe(0);
   });
 
