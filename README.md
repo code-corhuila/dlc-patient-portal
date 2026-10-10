@@ -1,9 +1,15 @@
-# dlc-iam-portal
+# dlc-patients-portal
 
-> iam bounded context: web UI (remote)
+> Patients bounded context: administrative web UI.
 
 Part of the **Di-lucca** distributed system — team `di-lucca`, Grupo 2.
-Governance and documentation live in [`library-docs`](https://github.com/code-corhuila/dilucca-docs).
+Governance and documentation live in [`dlc-docs`](https://github.com/code-corhuila/dlc-docs).
+
+## Composition entry
+
+Run `npm run build:portal` to create `dist/dlc-patients-portal/portal/browser/entry.js`. It exports `portalId` (`patient`), `contractVersion` (`1`) and `mount` without bootstrapping on import. Publish the complete browser directory under the compositor's versioned same-origin release path; registry and hosting configuration belong to deployment.
+
+The mounted frame currently reports unavailable domain integration and does not load fixtures. `npm start` and `npm run build` retain the separate standalone development application. See [lifecycle evidence and remaining scope](docs/hu-pat-001-mount-lifecycle.md).
 
 ## Branching
 
