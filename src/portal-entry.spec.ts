@@ -1,3 +1,4 @@
+import { ApplicationRef, ErrorHandler } from '@angular/core';
 import { contractVersion, mount, portalId } from './portal-entry';
 import { PortalContext, PortalHandle } from './app/shell-contract';
 
@@ -127,6 +128,28 @@ describe('HU-PAT-001 / ADR-011 mount lifecycle', () => {
 
     expect(host.childElementCount).toBe(0);
     expect(removeListener).toHaveBeenCalled();
+    expect(context.reportFailure).toHaveBeenCalledOnceWith({ code: 'PORTAL_RENDER_FAILED' });
+  });
+
+  it('destroys a created application if root bootstrap fails', async () => {
+    const destroy = spyOn(ApplicationRef.prototype, 'destroy').and.callThrough();
+    spyOn(ApplicationRef.prototype, 'bootstrap').and.throwError('Sensitive bootstrap failure');
+
+    await expectAsync(mount(host, context)).toBeRejectedWithError('PORTAL_MOUNT_FAILED');
+
+    expect(destroy).toHaveBeenCalledTimes(1);
+    expect(host.childElementCount).toBe(0);
+    expect(context.reportFailure).toHaveBeenCalledOnceWith({ code: 'PORTAL_RENDER_FAILED' });
+  });
+  it('distinguishes a fatal Angular error from cancellation and reports it once', async () => {
+    spyOn(ApplicationRef.prototype, 'bootstrap').and.callFake(function (this: ApplicationRef) {
+      this.injector.get(ErrorHandler).handleError(new Error('Sensitive render failure'));
+      throw new Error('Sensitive render failure');
+    });
+
+    await expectAsync(mount(host, context)).toBeRejectedWithError('PORTAL_MOUNT_FAILED');
+
+    expect(host.childElementCount).toBe(0);
     expect(context.reportFailure).toHaveBeenCalledOnceWith({ code: 'PORTAL_RENDER_FAILED' });
   });
 });
