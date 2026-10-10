@@ -26,6 +26,14 @@
             ]
           },
           "configurations": {
+            "portal": {
+              "browser": "src/portal-entry.ts",
+              "index": false,
+              "assets": [],
+              "styles": [],
+              "outputPath": "dist/dlc-patients-portal/portal",
+              "outputHashing": "all"
+            },
             "production": {
               "budgets": [
                 {
