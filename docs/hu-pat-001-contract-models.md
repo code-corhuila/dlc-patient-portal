@@ -35,7 +35,7 @@ Execution date: 2026-10-10, America/Bogota. GREEN evidence applies to the implem
 | Owner responses, assignment authorization and clinical isolation | Real provider/integration tests | Pending |
 | CI and independent review | Attach revision-specific runs and reviewer decision to the PR | Pending |
 
-Run tests through `node_modules/.bin/ng.cmd` on Windows. ChromeHeadless required execution outside the sandbox. The reproducible HTML coverage report is generated under `coverage/dlc-patients-portal/index.html` and is not committed.
+Run tests through `node_modules/.bin/ng.cmd` on Windows. ChromeHeadless required execution outside the sandbox. The current reproducible HTML coverage report is generated under `coverage/dlc-patient-portal/index.html` after project identity normalization and is not committed.
 
 ## Remaining scope and decisions
 
