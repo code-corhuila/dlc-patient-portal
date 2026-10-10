@@ -13,7 +13,13 @@ The package and Angular project use the approved component name `dlc-patient-por
 
 The mounted frame currently reports unavailable domain integration and does not load fixtures. `npm start` and `npm run build` retain the separate standalone development application. See [lifecycle evidence and remaining scope](docs/hu-pat-001-mount-lifecycle.md).
 
-## Branching
+## Local CI checks
+
+Use Node 22.x. After `npm ci`, run `npm run test:coverage` and `npm run build`. Coverage checks enforce 80% globally and 90% lines for the patient projection/domain patterns. Reports are written to `coverage/dlc-patient-portal/`; the build also produces the composition entry through `postbuild`.
+
+CI records results for the tested revision; a successful run does not close HU-PAT-001. The separate generated-lockfile PR must merge before the CI baseline can pass a clean install. See [CI evidence](docs/hu-pat-001-ci-baseline.md).
+
+## Branch policy
 
 Three permanent branches. **None of them accepts a direct commit** — you enter through a child
 branch and leave through a Pull Request.
