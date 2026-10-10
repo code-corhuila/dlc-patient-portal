@@ -34,7 +34,7 @@ Executed 2026-10-10, America/Bogota. GREEN evidence applies to the implementatio
 | Built entry import without DOM | Node dynamic import; exact identity/version and callable mount checked | Passed |
 | CI, deployed compositor and independent review | Attach revision-specific evidence | Pending |
 
-ChromeHeadless runs required execution outside the sandbox. Coverage HTML is generated at `coverage/dlc-patients-portal/index.html`; generated artifacts are not committed. Build the standalone application before the portal: the standalone build clears its enclosing output directory.
+ChromeHeadless runs required execution outside the sandbox. Current coverage HTML is generated at `coverage/dlc-patient-portal/index.html` after identity normalization; generated artifacts are not committed. Build the standalone application before the portal: the standalone build clears its enclosing output directory.
 
 Diff baseline is `origin/develop` at `f699e33` (merged PR #7). The local `develop` ref still points to PR #6 and would incorrectly include the previous increment; verify size with `git diff --stat origin/develop...HEAD` after committing.
 
