@@ -4,7 +4,8 @@ import {
   Input,
 } from '@angular/core';
 
-import { Patient } from '../../model/patient';
+import { PatientView } from '../../model/patient';
+import { PatientListItem, toPatientListItem } from '../../model/patient-list-item';
 
 @Component({
   selector: 'app-patient-list',
@@ -14,5 +15,9 @@ import { Patient } from '../../model/patient';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PatientListComponent {
-  @Input() patients: Patient[] = [];
+  rows: PatientListItem[] = [];
+
+  @Input() set patients(patients: PatientView[]) {
+    this.rows = patients.map(toPatientListItem);
+  }
 }

@@ -1,7 +1,7 @@
 <section class="patient-list">
   <h2>Patients</h2>
 
-  @if (patients.length === 0) {
+  @if (rows.length === 0) {
     <p>No patients available.</p>
   } @else {
     <div class="table-container">
@@ -17,18 +17,17 @@
         </thead>
 
         <tbody>
-          @for (patient of patients; track patient.id) {
+          @for (patient of rows; track patient.id) {
             <tr>
-              <td>{{ patient.documentNumber }}</td>
+              <td>{{ patient.documentNumber ?? '—' }}</td>
 
               <td>
-                {{ patient.firstName }}
-                {{ patient.lastName }}
+                {{ patient.name }}
               </td>
 
-              <td>{{ patient.phone }}</td>
+              <td>{{ patient.phone ?? '—' }}</td>
 
-              <td>{{ patient.email }}</td>
+              <td>{{ patient.email ?? '—' }}</td>
 
               <td>{{ patient.status }}</td>
             </tr>
