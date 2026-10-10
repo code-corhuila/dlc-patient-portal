@@ -43,4 +43,4 @@ Coverage report: `coverage/dlc-patient-portal/index.html`. Packaging fixtures ar
 
 The existing lockfile dependency graph still describes Angular 20 while package.json requests Angular 21. Only its package identity changed here; no dependencies were regenerated. Reconcile this mismatch before a clean npm ci / CI acceptance, preserving the 400-line PR constraint through an explicit delivery plan. Existing node_modules enabled the measured local builds; no clean-install success is claimed.
 
-Real session/HTTP integration, patient workflows, deployment and HU acceptance remain pending. Previous evidence reports retain their historical plural output paths for their original revisions; this report documents the new current paths.
+Real session/HTTP integration, patient workflows, deployment and HU acceptance remain pending. Earlier execution results remain tied to their original revisions; report instructions use the current singular output paths.
