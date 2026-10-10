@@ -19,8 +19,9 @@ describe('PatientsMockService', () => {
         jasmine.objectContaining({
           id: jasmine.any(String),
           documentNumber: jasmine.any(String),
-          firstName: jasmine.any(String),
-          lastName: jasmine.any(String),
+          documentType: jasmine.any(String),
+          name: jasmine.any(String),
+          version: jasmine.any(Number),
         }),
       );
 
