@@ -104,4 +104,29 @@ describe('HU-PAT-001 / ADR-011 mount lifecycle', () => {
     await handle.unmount();
     await expectAsync(handle.updateRoute(context.route)).toBeRejectedWithError('CANCELLED');
   });
+
+  it('keeps another mounted Angular application alive when disposing this one', async () => {
+    const otherHost = document.createElement('div');
+    document.body.append(otherHost);
+    try {
+      const first = await open();
+      const second = await mount(otherHost, { ...context, signal: new AbortController().signal });
+      handles.push(second);
+      await first.unmount();
+      await second.updateRoute({ ...context.route, localPath: '/unknown' });
+      expect(otherHost.querySelector('dlc-patient-root')!.shadowRoot!.textContent)
+        .toContain('Page not found.');
+    } finally { otherHost.remove(); }
+  });
+
+  it('cleans partial DOM failures and reports only a safe failure code', async () => {
+    const removeListener = spyOn(controller.signal, 'removeEventListener').and.callThrough();
+    spyOn(host, 'append').and.throwError('Sensitive internal failure');
+
+    await expectAsync(mount(host, context)).toBeRejectedWithError('PORTAL_MOUNT_FAILED');
+
+    expect(host.childElementCount).toBe(0);
+    expect(removeListener).toHaveBeenCalled();
+    expect(context.reportFailure).toHaveBeenCalledOnceWith({ code: 'PORTAL_RENDER_FAILED' });
+  });
 });
