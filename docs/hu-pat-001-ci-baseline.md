@@ -33,8 +33,14 @@ ChromeHeadless required execution outside the sandbox. No remote workflow succes
 
 ## Dependency and merge order
 
-The separately generated `chore/hu-pat-001-lockfile` change must merge into develop first, then update this branch from develop without rebase and rerun CI. This branch intentionally retains the old lockfile until that dependency is integrated; its npm ci step cannot pass on its current base.
+The generated lockfile prerequisite merged into develop in PR #10 (`174d781`). This branch integrates that target revision through a normal merge, without rebase. Its subsequent correction includes optional peers required by the npm 10 Linux resolver; rerun hosted CI on the final PR revision.
 
 The user stated a course exception for the separate generated-lockfile PR; it does not waive the 400-line limit for this CI increment. Attach that exception evidence to the lockfile PR discussion. Keep the dependency graph out of this PR until it is already in the target branch.
 
 The workflow runs on pull requests and workflow_dispatch, not ordinary branch pushes. Publication alone does not produce CI acceptance. Use the supplied PR template, reviewed revision and linked reports; do not close issue #1 or claim HU-PAT-001 Done.
+
+## Linux resolver follow-up
+
+The first lockfile passed Windows/npm 11 installation but omitted `@emnapi/core` and `@emnapi/runtime`, peers of the optional WASM runtime. This was reproduced with npm 10.9.4 and Linux/x64 resolution: `npm ci --dry-run --ignore-scripts --os=linux --cpu=x64 --no-audit --no-fund` failed EUSAGE for both missing 1.11.3 entries.
+
+Regeneration with npm 10.9.4 `install --package-lock-only --include=optional --ignore-scripts --os=linux --cpu=x64 --no-audit --no-fund` adds those entries and normalizes peer metadata. Existing package versions and the manifest are unchanged. The identical Linux resolver validation now passes. This is resolver validation on Windows, not execution inside a Linux runtime; hosted Actions remains the authoritative Linux result.
