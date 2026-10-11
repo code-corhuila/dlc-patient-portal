@@ -1,0 +1,53 @@
+<main class="patient-form-page">
+  <header>
+    <button class="back-link" type="button" [disabled]="busy" (click)="cancel.emit()">Back to patients</button>
+    <h1>{{ title }}</h1>
+    <p>Fictional administrative data only. No information is sent to an API.</p>
+  </header>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <p data-error-summary tabindex="-1" role="alert">{{ form.touched && form.invalid ? 'Check the highlighted fields before saving.' : '' }}</p>
+    <div class="form-grid">
+      @for (field of fields; track field.key) {
+        <label class="field" [for]="'patient-' + field.key">
+          <span>{{ field.label }}{{ field.required ? ' *' : '' }}</span>
+          <input [id]="'patient-' + field.key" [type]="field.type" [readOnly]="busy || saved" [formControlName]="field.key"
+            [attr.maxlength]="field.max" [attr.required]="field.required ? '' : null"
+            [attr.aria-invalid]="form.controls[field.key].touched && form.controls[field.key].invalid"
+            [attr.aria-describedby]="'patient-error-' + field.key" />
+          <span [id]="'patient-error-' + field.key" class="field-error">
+            @if (form.controls[field.key].touched && form.controls[field.key].invalid) {
+              Enter a valid {{ field.label.toLowerCase() }} within the allowed length.
+              @if (field.key === 'birthDate') { Use a valid past date. }
+            }
+          </span>
+        </label>
+      }
+    </div>
+    <div formArrayName="additionalContacts">
+      @for (contact of form.controls.additionalContacts.controls; track contact; let i = $index) {
+        <fieldset [formGroupName]="i" [disabled]="busy || saved">
+          <legend>Additional emergency contact {{ i + 1 }}</legend>
+          <label class="field">Name <input formControlName="name" [attr.maxlength]="contactLimits.name" /></label>
+          <label class="field">Relationship <input formControlName="relationship" [attr.maxlength]="contactLimits.relationship" /></label>
+          <label class="field">Phone <input type="tel" formControlName="phone" [attr.maxlength]="contactLimits.phone" /></label>
+          <button type="button" (click)="form.controls.additionalContacts.removeAt(i); form.markAsDirty()">Remove contact</button>
+        </fieldset>
+      }
+    </div>
+    <button type="button" [disabled]="busy || saved" (click)="addContact()">Add another emergency contact</button>
+    @if (form.touched && form.hasError('emergencyContact')) {
+      <p role="alert">Complete the name, relationship and phone of the emergency contact.</p>
+    }
+    @if (failure) { <p role="alert">{{ failure }}</p> }
+    @if (saved) { <p role="status">Changes saved in this local demo.</p> }
+    <footer class="form-actions">
+      <button class="cancel-button" type="button" [disabled]="busy" (click)="cancel.emit()">Cancel</button>
+      <button class="save-button" type="submit" [disabled]="saved || busy">Save patient</button>
+    </footer>
+  </form>
+</main>
+<dialog #leaveDialog aria-labelledby="patient-leave-title" (cancel)="$event.preventDefault(); answerLeave(false)">
+  <h2 id="patient-leave-title">Discard unsaved changes?</h2>
+  <button type="button" data-keep (click)="answerLeave(false)">Keep editing</button>
+  <button type="button" (click)="answerLeave(true)">Discard changes</button>
+</dialog>
