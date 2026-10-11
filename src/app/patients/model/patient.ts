@@ -42,3 +42,5 @@ export interface PatientPage {
 export type CreatePatientRequest = Required<Pick<Patient,
   'documentType' | 'documentNumber' | 'name' | 'birthDate' | 'phone' | 'email'>> &
   Pick<Patient, 'address' | 'emergencyContacts'>;
+
+export type UpdatePatientRequest = Partial<CreatePatientRequest> & { expectedVersion: number };
