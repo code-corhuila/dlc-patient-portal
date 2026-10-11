@@ -58,4 +58,12 @@ describe('PatientListComponent', () => {
     expect(cells[2].textContent.trim()).toBe('—');
     expect(cells[3].textContent.trim()).toBe('—');
   });
-});
+  it('hides editing by default and emits only the selected id when enabled', () => {
+    const fixture = TestBed.createComponent(PatientListComponent);
+    fixture.componentRef.setInput('patients', [{ id: 'patient-id', documentType: 'CC', name: 'Patient', status: 'ACTIVE', version: 1 }]);
+    fixture.detectChanges(); expect(fixture.nativeElement.querySelector('[data-edit]')).toBeNull();
+    fixture.componentRef.setInput('editable', true); fixture.detectChanges();
+    const edit = jasmine.createSpy(); fixture.componentInstance.edit.subscribe(edit);
+    fixture.nativeElement.querySelector('[data-edit]').click();
+    expect(edit).toHaveBeenCalledOnceWith('patient-id');
+  });});

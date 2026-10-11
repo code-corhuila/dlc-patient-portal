@@ -1,15 +1,17 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   OnInit,
   DestroyRef,
   inject,
   Input,
+  output,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { PatientListComponent } from '../../components/patient-list/patient-list.component';
-import { PatientsMockService } from '../../data/patients-mock.service';
+import { PATIENTS_PORT } from '../../data/patients.port';
 import { Patient } from '../../model/patient';
 
 @Component({
@@ -22,8 +24,11 @@ import { Patient } from '../../model/patient';
 })
 export class PatientsPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly changeDetector = inject(ChangeDetectorRef);
   patients: Patient[] = [];
   @Input() search = '';
+  @Input() editable = false;
+  readonly edit = output<string>();
 
   get visiblePatients(): Patient[] {
     const query = this.search.trim().toLowerCase();
@@ -31,9 +36,8 @@ export class PatientsPageComponent implements OnInit {
       .some(value => value.toLowerCase().includes(query)));
   }
 
-  constructor(
-    private readonly patientsService: PatientsMockService,
-  ) {}
+  readonly add = output<void>();
+  private readonly patientsService = inject(PATIENTS_PORT);
 
   ngOnInit(): void {
     this.patientsService
@@ -41,6 +45,7 @@ export class PatientsPageComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((patients) => {
         this.patients = patients;
+        this.changeDetector.markForCheck();
       });
   }
 }

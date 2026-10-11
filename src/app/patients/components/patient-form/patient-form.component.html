@@ -9,9 +9,9 @@
     <div class="form-grid">
       @for (field of fields; track field.key) {
         <label class="field" [for]="'patient-' + field.key">
-          <span>{{ field.label }}{{ field.required ? ' *' : '' }}</span>
+          <span>{{ field.label }}{{ mode === 'create' && field.required ? ' *' : '' }}</span>
           <input [id]="'patient-' + field.key" [type]="field.type" [readOnly]="busy || saved" [formControlName]="field.key"
-            [attr.maxlength]="field.max" [attr.required]="field.required ? '' : null"
+            [attr.maxlength]="field.max" [attr.required]="mode === 'create' && field.required ? '' : null"
             [attr.aria-invalid]="form.controls[field.key].touched && form.controls[field.key].invalid"
             [attr.aria-describedby]="'patient-error-' + field.key" />
           <span [id]="'patient-error-' + field.key" class="field-error">

@@ -23,6 +23,11 @@ export class PatientFormComponent {
   };
   readonly save = output<CreatePatientRequest>();
   readonly cancel = output<void>();
+  private initial: Partial<CreatePatientRequest> = {};
+  private editing = false;
+  private readonly createValidators = Object.fromEntries(this.fields.map(field => [field.key, this.core.controls[field.key].validator]));
+  @Input() set mode(value: 'create' | 'edit') { this.editing = value === 'edit'; this.applyMode(); }
+  get mode(): 'create' | 'edit' { return this.editing ? 'edit' : 'create'; }
   @Input() title = 'Add patient';
   @Input() failure = '';
   @Input() saved = false;
@@ -31,7 +36,8 @@ export class PatientFormComponent {
     additionalContacts: new FormArray<ReturnType<PatientFormComponent['contactGroup']>>([]),
   }, { validators: this.core.validator });
 
-  @Input() set initialValue(value: CreatePatientRequest | null) {
+  @Input() set initialValue(value: Partial<CreatePatientRequest> | null) {
+    this.initial = structuredClone(value ?? {});
     this.answerLeave(false);
     const contact = value?.emergencyContacts?.[0];
     const extras = value?.emergencyContacts?.slice(1) ?? [];
@@ -41,9 +47,17 @@ export class PatientFormComponent {
     this.form.reset({ ...blank, ...value, address: value?.address ?? '', additionalContacts: extras,
       emergencyName: contact?.name ?? '', emergencyRelationship: contact?.relationship ?? '',
       emergencyPhone: contact?.phone ?? '' });
+    this.applyMode();
   }
 
-  constructor() { inject(DestroyRef).onDestroy(() => this.answerLeave(false)); }
+  private applyMode(): void {
+    for (const field of this.fields) {
+      const control = this.form.controls[field.key];
+      control.setValidators(candidate => this.editing && !this.initial[field.key as keyof CreatePatientRequest] &&
+        !String(candidate.value).trim() ? null : this.createValidators[field.key]?.(candidate) ?? null);
+      control.updateValueAndValidity({ emitEvent: false });
+    }
+  }  constructor() { inject(DestroyRef).onDestroy(() => this.answerLeave(false)); }
   submit(): void {
     if (this.saved || this.busy) return;
     for (const field of this.fields) {
