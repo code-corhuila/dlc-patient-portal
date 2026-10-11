@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, writeFile, rm, stat, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { once } from 'node:events';
@@ -26,6 +26,8 @@ test('C01: publish the complete bundle under the versioned patient descriptor', 
   assert.equal(descriptor.portalId, 'patient');
   assert.equal(descriptor.repository, 'dlc-patient-portal');
   assert.equal(descriptor.entryUrl, '/portals/patient/0.1.0-demo/entry.js');
+  assert.deepEqual(descriptor.navigation[0].visibility, { rolesAny: [], permissionsAll: [] });
+  assert.equal(descriptor.navigation[0].label, 'Pacientes');
   const release = join(destination, 'portals/patient/0.1.0-demo');
   assert.match(await readFile(join(release, 'entry.js'), 'utf8'), /portalId/);
   assert.equal(await readFile(join(release, 'chunk-DEMO.js'), 'utf8'), 'export const data = [];');
@@ -36,6 +38,47 @@ test('C01: publish the complete bundle under the versioned patient descriptor', 
   const next = await publishDemoRelease(source, destination, '0.2.0-demo');
   assert.equal(next.entryUrl, '/portals/patient/0.2.0-demo/entry.js');
   assert.equal(await readFile(join(release, 'entry.js'), 'utf8'), 'export const portalId = "patient";');
+});
+
+test('C01: the published release is accessible to the nginx runtime user',
+  { skip: process.platform === 'win32' }, async t => {
+    const { publishDemoRelease } = await import('./prepare-demo-release.mjs');
+    const { source, destination } = await fixture(t);
+    await publishDemoRelease(source, destination);
+    const directory = await stat(join(destination, 'portals/patient/0.1.0-demo'));
+    assert.equal(directory.mode & 0o005, 0o005, 'nginx requires read and traverse permissions');
+  });
+
+test('C01: recover a descriptor failure without deleting or changing published assets', async t => {
+  const { publishDemoRelease, recoverDemoDescriptor } = await import('./prepare-demo-release.mjs');
+  const { source, destination } = await fixture(t);
+  const target = join(destination, 'patient-descriptor.json');
+  await mkdir(target, { recursive: true });
+  await assert.rejects(publishDemoRelease(source, destination));
+  const release = join(destination, 'portals/patient/0.1.0-demo');
+  const stored = JSON.parse(await readFile(join(release, 'patient-descriptor.json'), 'utf8'));
+  assert.equal(stored.release, '0.1.0-demo');
+  assert.equal(resolve(target), resolve(destination, 'patient-descriptor.json'));
+  await rm(target, { recursive: true });
+  await writeFile(join(source, 'entry.js'), 'changed unpublished source');
+  await recoverDemoDescriptor(destination, '0.1.0-demo');
+  assert.deepEqual(JSON.parse(await readFile(target, 'utf8')), stored);
+  assert.equal(await readFile(join(release, 'entry.js'), 'utf8'), 'export const portalId = "patient";');
+  assert.deepEqual((await readdir(destination)).sort(), ['patient-descriptor.json', 'portals']);
+  await assert.rejects(recoverDemoDescriptor(destination, '../escape'), /INVALID_RELEASE/);
+});
+
+test('C01: concurrent publishers preserve the winner and reject the loser as RELEASE_EXISTS', async t => {
+  const { publishDemoRelease } = await import('./prepare-demo-release.mjs');
+  const { source, destination } = await fixture(t);
+  const results = await Promise.allSettled([
+    publishDemoRelease(source, destination), publishDemoRelease(source, destination),
+  ]);
+  assert.equal(results.filter(result => result.status === 'fulfilled').length, 1);
+  assert.match(results.find(result => result.status === 'rejected').reason.message, /RELEASE_EXISTS/);
+  assert.equal(await readFile(join(destination, 'portals/patient/0.1.0-demo/entry.js'), 'utf8'),
+    'export const portalId = "patient";');
+  assert.deepEqual((await readdir(destination)).sort(), ['patient-descriptor.json', 'portals']);
 });
 
 test('C01: invalid releases and missing entry cannot publish a descriptor', async t => {
