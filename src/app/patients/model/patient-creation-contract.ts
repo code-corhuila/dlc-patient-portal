@@ -1,17 +1,18 @@
 import { CreatePatientRequest } from './patient';
 
 // Patients OpenAPI CreatePatient: administrative fields only; documentType has no enum.
+// Labels are Spanish display text from the dlc-docs mock-up; keys stay the contract identifiers.
 export const PATIENT_CREATION_FIELDS = [
-  { key: 'documentType', label: 'Document type', type: 'text', max: 30, required: true },
-  { key: 'documentNumber', label: 'Document number', type: 'text', max: 50, required: true },
-  { key: 'name', label: 'Full name', type: 'text', max: 255, required: true },
-  { key: 'birthDate', label: 'Birth date', type: 'date', max: null, required: true },
-  { key: 'phone', label: 'Phone', type: 'tel', max: 40, required: true },
-  { key: 'email', label: 'Email', type: 'email', max: 255, required: true },
-  { key: 'address', label: 'Address (optional)', type: 'text', max: 500, required: false },
-  { key: 'emergencyName', label: 'Emergency contact name', type: 'text', max: 255, required: false },
-  { key: 'emergencyRelationship', label: 'Contact relationship', type: 'text', max: 80, required: false },
-  { key: 'emergencyPhone', label: 'Contact phone', type: 'tel', max: 40, required: false },
+  { key: 'documentType', label: 'Tipo Documento', type: 'text', max: 30, required: true },
+  { key: 'documentNumber', label: 'Número Documento', type: 'text', max: 50, required: true },
+  { key: 'name', label: 'Nombre completo', type: 'text', max: 255, required: true },
+  { key: 'birthDate', label: 'Fecha de Nacimiento', type: 'date', max: null, required: true },
+  { key: 'phone', label: 'Teléfono', type: 'tel', max: 40, required: true },
+  { key: 'email', label: 'Correo Electrónico', type: 'email', max: 255, required: true },
+  { key: 'address', label: 'Dirección de Residencia', type: 'text', max: 500, required: false },
+  { key: 'emergencyName', label: 'Nombre del contacto', type: 'text', max: 255, required: false },
+  { key: 'emergencyRelationship', label: 'Parentesco', type: 'text', max: 80, required: false },
+  { key: 'emergencyPhone', label: 'Teléfono del contacto', type: 'tel', max: 40, required: false },
 ] as const;
 export type PatientCreationValues = Record<typeof PATIENT_CREATION_FIELDS[number]['key'], string>;
 
