@@ -1,0 +1,7 @@
+<dialog #modal aria-label="Edit patient" (cancel)="$event.preventDefault(); finished.emit()">
+  @if (allowed && patient) {
+    <app-patient-form mode="edit" title="Edit patient" [initialValue]="patient" [failure]="failure"
+      [busy]="busy" [saved]="saved" (save)="save($event)" (cancel)="finished.emit()" />
+  } @else { <p role="alert">{{ failure }}</p><button type="button" (click)="finished.emit()">Back to patients</button> }
+  @if (conflict) { <button type="button" (click)="reload()">Reload patient</button> }
+</dialog>

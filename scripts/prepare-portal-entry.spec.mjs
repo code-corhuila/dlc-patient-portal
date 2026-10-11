@@ -5,6 +5,24 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
+test('C03: composed build cannot reach standalone routing or the fictional Administrator harness', async () => {
+  const config = JSON.parse(await readFile(new URL('../angular.json', import.meta.url), 'utf8'));
+  const build = config.projects['dlc-patient-portal'].architect.build;
+  assert.equal(build.options.browser, 'src/main.ts');
+  assert.equal(build.configurations.portal.browser, 'src/portal-entry.ts');
+  const visited = new Set();
+  async function inspect(path) {
+    if (visited.has(path.href)) return;
+    visited.add(path.href);
+    const source = await readFile(path, 'utf8');
+    assert.doesNotMatch(source, /@angular\/router|patient-demo|app\.config|app\.routes|patients\.routes/);
+    for (const [, dependency] of source.matchAll(/(?:from\s*|import\s*\()\s*['"](\.[^'"]+)['"]/g)) {
+      await inspect(new URL(dependency + '.ts', path));
+    }
+  }
+  await inspect(new URL('../src/portal-entry.ts', import.meta.url));
+});
+
 test('HU-PAT-001: package the entry at the configured Angular output path', async () => {
   const prefix = join(tmpdir(), 'patient-entry-');
   const workspace = await mkdtemp(prefix);

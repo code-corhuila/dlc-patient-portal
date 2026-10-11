@@ -8,6 +8,6 @@
   </header>
 
   <app-patient-list
-    [patients]="visiblePatients"
+    [patients]="visiblePatients" [editable]="editable" (edit)="edit.emit($event)"
   />
 </main>
