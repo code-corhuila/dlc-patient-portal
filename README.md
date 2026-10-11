@@ -17,7 +17,7 @@ The `/new` local route supports administrative dummy registration, optional addr
 
 ## Demo delivery for dlc-front
 
-From a clean checkout, run `npm run build:demo`, then `npm run serve:demo` for versioned assets on localhost:4177. This serves `entry.js`, not a standalone page. For containers, start Docker and run `docker compose -f deploy/compose.yml up --build -d`. Existing release folders are immutable; select a new release with `npm run build:demo -- 0.1.1-demo`.
+From a clean checkout, run `npm run build:demo`, then `npm run serve:demo` for versioned assets on localhost:4178. This serves `entry.js`, not a standalone page. For containers, start Docker and run `docker compose -f deploy/compose.yml up --build -d`. Existing release folders are immutable; select a new release with `npm run build:demo -- 0.1.1-demo`.
 
 The generated `dist/demo/patient-descriptor.json` supplies the Patients descriptor to the front team. Registry/proxy registration and browser integration remain pending in dlc-front. See [delivery contract and evidence](docs/hu-pat-001-demo-delivery.md).
 
