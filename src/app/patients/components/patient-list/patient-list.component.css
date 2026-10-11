@@ -1,0 +1,156 @@
+.patient-list {
+  background: var(--pat-surface);
+  border: 1px solid var(--pat-border);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgb(16 24 40 / 5%);
+  overflow: hidden;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  padding: 1.25rem 0.9rem;
+  border-bottom: 1px solid var(--pat-border);
+  color: var(--pat-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+td {
+  padding: 1rem 0.9rem;
+  border-bottom: 1px solid var(--pat-border);
+  color: var(--pat-text);
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+tbody tr:hover td {
+  background: var(--pat-row-hover);
+}
+
+.patient-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  display: inline-grid;
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--pat-chip);
+  color: var(--pat-muted-strong);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.name {
+  display: block;
+  font-weight: 600;
+}
+
+.address {
+  display: block;
+  color: var(--pat-muted);
+  font-size: 0.75rem;
+}
+
+.chip {
+  display: block;
+  width: fit-content;
+  margin-bottom: 0.25rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--pat-chip);
+  color: var(--pat-muted-strong);
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.document {
+  font-weight: 600;
+}
+
+.status {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.status-active {
+  background: var(--pat-chip);
+  color: var(--pat-text);
+}
+
+.status-inactive {
+  background: var(--pat-danger-soft);
+  color: var(--pat-danger);
+}
+
+.icon-button {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--pat-muted);
+  cursor: pointer;
+}
+
+.icon-button:hover,
+.icon-button:focus-visible {
+  background: var(--pat-primary-soft);
+  color: var(--pat-primary);
+}
+
+.empty {
+  margin: 0;
+  padding: 2.5rem 1.5rem;
+  color: var(--pat-muted);
+  text-align: center;
+}
+
+/* Phone, birth date and status stay on one line, as in the mock-up. */
+td:nth-child(3),
+td:nth-child(5),
+td:nth-child(6) {
+  white-space: nowrap;
+}
+
+.address {
+  max-width: 9rem;
+}
+
+th:first-child,
+td:first-child {
+  padding-left: 1.5rem;
+}
+
+th:last-child,
+td:last-child {
+  padding-right: 1.5rem;
+}

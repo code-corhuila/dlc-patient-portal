@@ -1,0 +1,57 @@
+<div class="modal-backdrop">
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="pat-registration-title">
+    <header class="modal-header">
+      <h2 id="pat-registration-title">Registrar Nuevo Paciente</h2>
+      <button class="close-button" type="button" data-close aria-label="Cerrar" (click)="cancelled.emit()">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </header>
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="pat-fields">
+        @for (field of profileFields; track field.key) {
+          <label class="field" [class.wide]="wideFields.has(field.key)" [for]="'pat-' + field.key">
+            <span>{{ field.label }}{{ field.required ? ' *' : '' }}</span>
+            <input [id]="'pat-' + field.key" [type]="field.type" [formControlName]="field.key"
+              [required]="field.required" [attr.maxlength]="field.max || null"
+              [attr.placeholder]="placeholders[field.key] ?? null"
+              [attr.list]="field.key === 'documentType' ? 'pat-document-types' : null"
+              [attr.aria-invalid]="submitted() && form.controls[field.key].invalid"
+              [attr.aria-describedby]="submitted() && form.controls[field.key].invalid ? 'pat-' + field.key + '-error' : null" />
+            @if (submitted() && form.controls[field.key].invalid) {
+              <small class="field-error" [id]="'pat-' + field.key + '-error'">Revisa {{ field.label.toLowerCase() }}.</small>
+            }
+          </label>
+        }
+      </div>
+      <datalist id="pat-document-types">
+        @for (type of documentTypes; track type.value) { <option [value]="type.value">{{ type.label }}</option> }
+      </datalist>
+      <fieldset class="contact">
+        <legend>Contacto de emergencia (opcional)</legend>
+        <div class="pat-fields contact-fields">
+          @for (field of contactFields; track field.key) {
+            <label class="field" [for]="'pat-' + field.key">
+              <span>{{ field.label }}</span>
+              <input [id]="'pat-' + field.key" [type]="field.type" [formControlName]="field.key"
+                [attr.maxlength]="field.max || null" />
+            </label>
+          }
+        </div>
+      </fieldset>
+      @if (error()) { <p class="form-error" role="alert">{{ error() }}</p> }
+      @if (saved()) { <p class="form-success" role="status">Paciente registrado en la memoria de la demo.</p> }
+      <footer class="pat-actions">
+        <button class="secondary-button" type="button" data-cancel (click)="cancelled.emit()">Cancelar</button>
+        <button class="primary-button" type="submit" [disabled]="saved()">Guardar Paciente</button>
+      </footer>
+    </form>
+  </section>
+</div>
+<dialog class="leave-dialog" #leaveDialog aria-labelledby="pat-leave-title" (cancel)="$event.preventDefault(); decideLeave(false)">
+  <h2 id="pat-leave-title">¿Descartar los cambios sin guardar?</h2>
+  <div class="pat-actions">
+    <button class="secondary-button" type="button" (click)="decideLeave(false)">Seguir editando</button>
+    <button class="danger-button" type="button" (click)="decideLeave(true)">Descartar cambios</button>
+  </div>
+</dialog>

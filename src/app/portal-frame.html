@@ -1,0 +1,35 @@
+<div class="dlc-patient-portal">
+  @if (session().state !== 'authenticated') {
+    <section class="notice">
+      <h1>Gestión de Pacientes</h1>
+      @if (session().state === 'resolving') {
+        <p role="status">Cargando sesión...</p>
+      } @else if (session().state === 'unavailable') {
+        <p role="alert">La sesión no está disponible.</p>
+      } @else {
+        <p role="status">Inicia sesión en la aplicación para acceder a los pacientes.</p>
+      }
+    </section>
+  } @else if (!canReadAdministrativeDemo()) {
+    <section class="notice">
+      <h1>Gestión de Pacientes</h1>
+      <p role="status">Los datos administrativos de demostración no están disponibles para este rol.
+        La vista de pacientes asignados al odontólogo está pendiente.</p>
+    </section>
+  } @else if (route().localPath === '/' || route().localPath === '/new' || editId()) {
+    <app-patients-page [search]="route().query['q']?.[0] ?? ''" [editable]="true"
+      (add)="navigate('/app/patients/new')" (edit)="editPatient($event)" />
+    @if (route().localPath === '/new') {
+      <app-patient-registration (registered)="returnToPatients()" (cancelled)="returnToPatients()" />
+    }
+    @if (editId()) { <app-patient-edit [patientId]="editId()!" [allowed]="true" (finished)="returnToPatients()" /> }
+  } @else {
+    <section class="notice">
+      <h1>Página no encontrada.</h1>
+      <button class="primary-button" type="button" (click)="returnToPatients()">Volver a pacientes</button>
+    </section>
+  }
+  @if (navigationFailed()) {
+    <p class="navigation-error" role="alert">No se pudo aplicar la navegación.</p>
+  }
+</div>
