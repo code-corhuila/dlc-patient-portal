@@ -1,11 +1,15 @@
 import { CreatePatientRequest, Patient, UpdatePatientRequest } from './patient';
-import { PATIENT_CREATION_FIELDS } from './patient-creation-contract';
 
 export function patientEditRequest(current: Patient, draft: CreatePatientRequest): UpdatePatientRequest | null {
   const request: UpdatePatientRequest = { expectedVersion: current.version };
-  for (const field of PATIENT_CREATION_FIELDS.filter(field => !field.key.startsWith('emergency'))) {
-    const key = field.key as keyof CreatePatientRequest;
-    const value = typeof draft[key] === 'string' ? String(draft[key]).trim() : '';
+  const keys = ['documentType', 'documentNumber', 'name', 'birthDate', 'phone', 'email', 'address'] as const satisfies readonly (keyof CreatePatientRequest)[];
+  for (const key of keys) {
+    const raw = draft[key];
+    if (raw === undefined && current[key] === undefined) continue;
+    if (typeof raw !== 'string') throw new Error('INVALID_UPDATE');
+    const value = raw.trim();
+    if (!value && current[key] === undefined) continue;
+    if (!value) throw new Error('INVALID_UPDATE');
     if (value !== (current[key] ?? '')) Object.assign(request, { [key]: value });
   }
   const canonical = (contacts: CreatePatientRequest['emergencyContacts']) =>

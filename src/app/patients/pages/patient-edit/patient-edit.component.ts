@@ -38,11 +38,11 @@ export class PatientEditComponent implements OnChanges, AfterViewInit {
   private canSave(): boolean { return this.allowed && this.alive && !this.busy && !this.saved; }
   save(draft: CreatePatientRequest): void {
     const current = this.patient; if (!current || !this.canSave()) return;
-    if (current.address && !draft.address) { this.failure = 'The approved contract does not support clearing address.'; return; }
-    const request = patientEditRequest(current, draft);
-    if (!request) { this.failure = 'No changes to save.'; return; }
-    this.busy = true; this.failure = ''; this.conflict = false;
+    if (current.address && !draft.address?.trim()) { this.failure = 'The approved contract does not support clearing address.'; return; }
     try {
+      const request = patientEditRequest(current, draft);
+      if (!request) { this.failure = 'No changes to save.'; return; }
+      this.busy = true; this.failure = ''; this.conflict = false;
       const result = this.patients.updatePatient(this.patientId, request);
       if (result.ok) { this.saved = true; this.finished.emit(); }
       else {
