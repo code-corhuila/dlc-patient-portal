@@ -1,16 +1,18 @@
-import { Component, computed, DestroyRef, inject, signal, ViewEncapsulation } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal, ViewChild, ViewEncapsulation } from '@angular/core';
 import { PORTAL_CONTEXT } from './shell-contract';
 import { PatientsPageComponent } from './patients/pages/patients-page/patients-page.component';
+import { PatientRegistrationComponent } from './patients/pages/patient-registration/patient-registration.component';
 
 @Component({
   selector: 'dlc-patient-root',
   standalone: true,
-  imports: [PatientsPageComponent],
+  imports: [PatientsPageComponent, PatientRegistrationComponent],
   encapsulation: ViewEncapsulation.ShadowDom,
   templateUrl: './portal-frame.html',
   styleUrl: './portal-frame.css',
 })
 export class PortalFrame {
+  @ViewChild(PatientRegistrationComponent) private registration?: PatientRegistrationComponent;
   private readonly context = inject(PORTAL_CONTEXT);
   private alive = true;
   readonly route = signal(this.context.route);
@@ -32,10 +34,14 @@ export class PortalFrame {
     });
   }
 
-  async returnToPatients(): Promise<void> {
+  returnToPatients(): Promise<void> { return this.navigate('/app/patients'); }
+
+  canLeave(): boolean { return this.registration?.canLeave() ?? true; }
+
+  async navigate(path: string): Promise<void> {
     const revision = this.session().revision;
     try {
-      const result = await this.context.navigation.request({ path: '/app/patients' });
+      const result = await this.context.navigation.request({ path });
       if (this.alive && this.session().revision === revision) {
         this.navigationFailed.set(result.status === 'rejected');
       }

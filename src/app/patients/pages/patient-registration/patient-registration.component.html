@@ -1,0 +1,24 @@
+<section class="pat-registration">
+  <h1>Register patient</h1>
+  <p>Fictional data only. Changes are stored in this mounted demo, without an API.</p>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="pat-fields">
+      @for (field of fields; track field.key) {
+        <label [for]="'pat-' + field.key">{{ field.label }}
+          <input [id]="'pat-' + field.key" [type]="field.type" [formControlName]="field.key"
+            [required]="field.required" [attr.maxlength]="field.max || null"
+            [attr.aria-describedby]="submitted() && form.controls[field.key].invalid ? 'pat-' + field.key + '-error' : null" />
+          @if (submitted() && form.controls[field.key].invalid) {
+            <small [id]="'pat-' + field.key + '-error'">Review {{ field.label }}.</small>
+          }
+        </label>
+      }
+    </div>
+    @if (error()) { <p role="alert">{{ error() }}</p> }
+    @if (saved()) { <p role="status">Patient created in demo memory.</p> }
+    <div class="pat-actions">
+      <button type="submit" [disabled]="saved()">Create patient</button>
+      <button type="button" (click)="cancelled.emit()">Back to patients</button>
+    </div>
+  </form>
+</section>
