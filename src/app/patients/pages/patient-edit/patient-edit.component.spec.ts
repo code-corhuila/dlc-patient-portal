@@ -25,13 +25,13 @@ describe('HU-PAT-001 patient editing', () => {
   });
   it('shows not found without rendering a form', () => {
     const fixture = render(true, 'missing');
-    expect(fixture.nativeElement.textContent).toContain('Patient not found');
+    expect(fixture.nativeElement.textContent).toContain('Paciente no encontrado');
     expect(fixture.nativeElement.querySelector('app-patient-form')).toBeNull();
   });
   it('rejects unchanged submissions', () => {
     const fixture = render(); const update = spyOn(TestBed.inject(PatientsMockService), 'updatePatient').and.callThrough();
     fixture.componentInstance.save({ documentType: 'CC', documentNumber: '1000000001', name: 'Ana Demo', phone: '3000000001', email: 'ana.demo@example.com', birthDate: '' });
-    expect(update).not.toHaveBeenCalled(); expect(fixture.componentInstance.failure).toContain('No changes');
+    expect(update).not.toHaveBeenCalled(); expect(fixture.componentInstance.failure).toContain('No hay cambios');
   });
   it('handles conflicts without overwriting the draft and supports explicit reload', async () => {
     const fixture = render(); const store = TestBed.inject(PatientsMockService);
@@ -39,7 +39,7 @@ describe('HU-PAT-001 patient editing', () => {
     fixture.componentInstance.formComponent!.form.controls.name.setValue('My draft');
     fixture.componentInstance.formComponent!.form.markAsDirty();
     fixture.componentInstance.formComponent!.submit(); fixture.detectChanges();
-    expect(fixture.componentInstance.failure).toContain('Reload');
+    expect(fixture.componentInstance.failure).toContain('Recarga');
     expect(fixture.componentInstance.formComponent!.form.controls.name.value).toBe('My draft');
     const reload = fixture.componentInstance.reload();
     fixture.componentInstance.formComponent!.answerLeave(true); await reload; fixture.detectChanges();
@@ -49,7 +49,7 @@ describe('HU-PAT-001 patient editing', () => {
     const fixture = render(); spyOn(TestBed.inject(PatientsMockService), 'updatePatient').and.throwError('private failure');
     fixture.componentInstance.formComponent!.form.controls.name.setValue('Changed');
     fixture.componentInstance.formComponent!.form.markAsDirty(); fixture.componentInstance.formComponent!.submit();
-    expect(fixture.componentInstance.failure).toBe('The demo could not update the patient.');
+    expect(fixture.componentInstance.failure).toBe('La demo no pudo actualizar el paciente.');
     const leave = fixture.componentInstance.canLeave(); fixture.componentInstance.formComponent!.answerLeave(false);
     expect(await leave).toBeFalse(); fixture.destroy();
   });
@@ -69,7 +69,7 @@ describe('HU-PAT-001 patient editing', () => {
     fixture.componentInstance.formComponent!.form.controls.address.setValue('');
     fixture.componentInstance.formComponent!.submit();
     expect(update).not.toHaveBeenCalled();
-    expect(fixture.componentInstance.failure).toContain('does not support clearing address');
+    expect(fixture.componentInstance.failure).toContain('no permite borrar la dirección');
   });
   it('clears contacts explicitly without sending unrelated empty fields', () => {
     const store = TestBed.inject(PatientsMockService);
@@ -81,7 +81,7 @@ describe('HU-PAT-001 patient editing', () => {
   });
   it('shows a safe read failure without rendering protected fields', () => {
     spyOn(TestBed.inject(PatientsMockService), 'getPatient').and.throwError('private lookup');
-    const fixture = render(); expect(fixture.nativeElement.textContent).toContain('could not load');
+    const fixture = render(); expect(fixture.nativeElement.textContent).toContain('no pudo cargar');
     expect(fixture.nativeElement.querySelector('app-patient-form')).toBeNull();
   });
   it('ignores retained callbacks after destruction', () => {

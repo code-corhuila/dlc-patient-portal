@@ -26,14 +26,17 @@ export class PatientsPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly changeDetector = inject(ChangeDetectorRef);
   patients: Patient[] = [];
-  @Input() search = '';
+  query = '';
+  onlyActive = false;
+  // The shell's `q` seeds the toolbar search; local typing refines it.
+  @Input() set search(value: string) { this.query = value; }
   @Input() editable = false;
   readonly edit = output<string>();
 
   get visiblePatients(): Patient[] {
-    const query = this.search.trim().toLowerCase();
-    return this.patients.filter(patient => [patient.name, patient.documentNumber ?? '']
-      .some(value => value.toLowerCase().includes(query)));
+    const query = this.query.trim().toLowerCase();
+    return this.patients.filter(patient => (!this.onlyActive || patient.status === 'ACTIVE') &&
+      [patient.name, patient.documentNumber ?? ''].some(value => value.toLowerCase().includes(query)));
   }
 
   readonly add = output<void>();

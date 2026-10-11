@@ -20,11 +20,15 @@ describe('Patient list projection — HU-PAT-001', () => {
     emergencyContacts: [{ name: 'Contact Demo', relationship: 'Family', phone: '3000000002' }],
   };
 
-  it('maps administrative data without forwarding detail-only fields', () => {
+  it('maps the mock-up row data without forwarding detail-only fields', () => {
     expect(toPatientListItem(administrativePatient)).toEqual({
       id: carePatient.id,
       name: 'Ana Demo',
+      initials: 'AD',
+      documentType: 'CC',
       documentNumber: '1000000001',
+      birthDate: '1990-01-15',
+      address: 'Fictional address',
       phone: '3000000001',
       email: 'ana.demo@example.com',
       status: 'ACTIVE',
@@ -35,19 +39,29 @@ describe('Patient list projection — HU-PAT-001', () => {
     expect(toPatientListItem(carePatient)).toEqual({
       id: carePatient.id,
       name: 'Ana Demo',
+      initials: 'AD',
+      documentType: undefined,
       documentNumber: undefined,
+      birthDate: undefined,
+      address: undefined,
       phone: undefined,
       email: undefined,
       status: 'ACTIVE',
     });
   });
 
+  it('derives at most two uppercase initials for the mock-up avatar', () => {
+    expect(toPatientListItem({ ...carePatient, name: '  maría josé rodríguez  ' }).initials).toBe('MR');
+    expect(toPatientListItem({ ...carePatient, name: 'Camila' }).initials).toBe('C');
+  });
+
   it('does not forward unexpected fields from an owner response', () => {
-    const response = { ...carePatient, documentNumber: 'PRIVATE', diagnosis: 'PRIVATE' };
+    const response = { ...carePatient, documentNumber: 'PRIVATE', address: 'PRIVATE', diagnosis: 'PRIVATE' };
 
     const item = toPatientListItem(response);
 
     expect(item.documentNumber).toBeUndefined();
+    expect(item.address).toBeUndefined();
     expect(Object.keys(item)).not.toContain('diagnosis');
     expect(response.documentNumber).toBe('PRIVATE');
   });

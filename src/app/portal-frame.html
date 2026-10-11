@@ -1,28 +1,35 @@
-<main class="dlc-patient-portal">
+<div class="dlc-patient-portal">
   @if (session().state !== 'authenticated') {
-    <h1>Patient administration</h1>
-    @if (session().state === 'resolving') {
-      <p role="status">Loading session...</p>
-    } @else if (session().state === 'unavailable') {
-      <p role="alert">Session unavailable.</p>
-    } @else {
-      <p role="status">Sign in through the application to access patients.</p>
-    }
+    <section class="notice">
+      <h1>Gestión de Pacientes</h1>
+      @if (session().state === 'resolving') {
+        <p role="status">Cargando sesión...</p>
+      } @else if (session().state === 'unavailable') {
+        <p role="alert">La sesión no está disponible.</p>
+      } @else {
+        <p role="status">Inicia sesión en la aplicación para acceder a los pacientes.</p>
+      }
+    </section>
   } @else if (!canReadAdministrativeDemo()) {
-    <h1>Patient administration</h1>
-    <p role="status">Administrative demo data is unavailable for this role.
-      The assigned-patient Dentist demo is pending.</p>
-  } @else if (route().localPath === '/' || editId()) {
-    <button type="button" (click)="navigate('/app/patients/new')">Register patient</button>
-    <app-patients-page [search]="route().query['q']?.[0] ?? ''" [editable]="true" (edit)="editPatient($event)" />
+    <section class="notice">
+      <h1>Gestión de Pacientes</h1>
+      <p role="status">Los datos administrativos de demostración no están disponibles para este rol.
+        La vista de pacientes asignados al odontólogo está pendiente.</p>
+    </section>
+  } @else if (route().localPath === '/' || route().localPath === '/new' || editId()) {
+    <app-patients-page [search]="route().query['q']?.[0] ?? ''" [editable]="true"
+      (add)="navigate('/app/patients/new')" (edit)="editPatient($event)" />
+    @if (route().localPath === '/new') {
+      <app-patient-registration (registered)="returnToPatients()" (cancelled)="returnToPatients()" />
+    }
     @if (editId()) { <app-patient-edit [patientId]="editId()!" [allowed]="true" (finished)="returnToPatients()" /> }
-  } @else if (route().localPath === '/new') {
-    <app-patient-registration (registered)="returnToPatients()" (cancelled)="returnToPatients()" />
   } @else {
-    <h1>Page not found.</h1>
-    <button type="button" (click)="returnToPatients()">Back to patients</button>
+    <section class="notice">
+      <h1>Página no encontrada.</h1>
+      <button class="primary-button" type="button" (click)="returnToPatients()">Volver a pacientes</button>
+    </section>
   }
   @if (navigationFailed()) {
-    <p role="alert">Navigation could not be applied.</p>
+    <p class="navigation-error" role="alert">No se pudo aplicar la navegación.</p>
   }
-</main>
+</div>

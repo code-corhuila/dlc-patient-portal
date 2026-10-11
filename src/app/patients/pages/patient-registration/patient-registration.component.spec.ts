@@ -27,12 +27,33 @@ describe('HU-PAT-001 dummy patient registration', () => {
     expect(register.calls.mostRecent().args[0].name).toBe('New Demo');
     expect(register.calls.mostRecent().args[0].address).toBeUndefined();
     expect(register.calls.mostRecent().args[0].emergencyContacts).toBeUndefined();
-    expect(fixture.nativeElement.textContent).toContain('Patient created in demo memory.');
+    expect(fixture.nativeElement.textContent).toContain('Paciente registrado en la memoria de la demo.');
     expect(fixture.nativeElement.querySelector('[type=submit]').disabled).toBeTrue();
     fixture.componentInstance.submit();
     expect(register).toHaveBeenCalledTimes(1);
     expect(registered).toHaveBeenCalledTimes(1);
     expect(await fixture.componentInstance.canLeave()).toBeTrue();
+  });
+
+  it('renders the mock-up modal with Spanish labels and actions', () => {
+    const root: HTMLElement = fixture.nativeElement;
+    const cancelled = jasmine.createSpy('cancelled');
+    fixture.componentInstance.cancelled.subscribe(cancelled);
+
+    expect(root.querySelector('[role=dialog] h2')!.textContent!.trim()).toBe('Registrar Nuevo Paciente');
+    const label = (key: string) => root.querySelector(`label[for="pat-${key}"] span`)!.textContent!.trim();
+    expect(label('name')).toBe('Nombre completo *');
+    expect(label('documentType')).toBe('Tipo Documento *');
+    expect(label('documentNumber')).toBe('Número Documento *');
+    expect(label('phone')).toBe('Teléfono *');
+    expect(label('email')).toBe('Correo Electrónico *');
+    expect(label('birthDate')).toBe('Fecha de Nacimiento *');
+    expect(label('address')).toBe('Dirección de Residencia');
+    expect(root.querySelector<HTMLInputElement>('#pat-documentType')!.getAttribute('list')).toBe('pat-document-types');
+    expect(root.querySelector('[type=submit]')!.textContent!.trim()).toBe('Guardar Paciente');
+    root.querySelector<HTMLButtonElement>('[data-cancel]')!.click();
+    root.querySelector<HTMLButtonElement>('[data-close]')!.click();
+    expect(cancelled).toHaveBeenCalledTimes(2);
   });
 
   it('rejects missing, invalid, future and impossible administrative values', () => {
@@ -51,7 +72,7 @@ describe('HU-PAT-001 dummy patient registration', () => {
   it('reports duplicates and unexpected failures safely while permitting a corrected retry', () => {
     fixture.componentInstance.form.setValue({ ...valid, documentNumber: '1000000003' });
     fixture.componentInstance.submit();
-    expect(fixture.componentInstance.error()).toContain('already exists');
+    expect(fixture.componentInstance.error()).toContain('ya existe');
     const register = spyOn(store, 'register').and.throwError('Sensitive failure');
     fixture.componentInstance.form.setValue(valid);
     fixture.componentInstance.submit();
