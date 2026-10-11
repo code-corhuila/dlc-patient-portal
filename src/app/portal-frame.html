@@ -12,9 +12,10 @@
     <h1>Patient administration</h1>
     <p role="status">Administrative demo data is unavailable for this role.
       The assigned-patient Dentist demo is pending.</p>
-  } @else if (route().localPath === '/') {
+  } @else if (route().localPath === '/' || editId()) {
     <button type="button" (click)="navigate('/app/patients/new')">Register patient</button>
-    <app-patients-page [search]="route().query['q']?.[0] ?? ''" />
+    <app-patients-page [search]="route().query['q']?.[0] ?? ''" [editable]="true" (edit)="editPatient($event)" />
+    @if (editId()) { <app-patient-edit [patientId]="editId()!" [allowed]="true" (finished)="returnToPatients()" /> }
   } @else if (route().localPath === '/new') {
     <app-patient-registration (registered)="returnToPatients()" (cancelled)="returnToPatients()" />
   } @else {

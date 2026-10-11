@@ -7,4 +7,10 @@ describe('PATIENTS_ROUTES', () => {
     expect(rootRoute).toBeDefined();
     expect(rootRoute?.component).toBeDefined();
   });
+
+  it('should expose the patient creation form route', () => {
+    const formRoute = PATIENTS_ROUTES.find((route) => route.path === 'new');
+
+    expect(formRoute?.component).toBeDefined();
+  });
 });
