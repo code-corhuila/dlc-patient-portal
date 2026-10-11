@@ -61,7 +61,7 @@ export async function mount(host: HTMLElement, context: PortalContext): Promise<
         application!.tick();
       },
       async canLeave() {
-        return true;
+        return component.instance.canLeave();
       },
       unmount,
     };
