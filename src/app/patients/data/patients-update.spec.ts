@@ -1,8 +1,10 @@
 import { TestBed } from '@angular/core/testing';
+import { Validators } from '@angular/forms';
+import { createPatientCreationForm } from '../components/patient-form/patient-creation-form';
 import { PatientsMockService } from './patients-mock.service';
 import { PATIENTS_PORT } from './patients.port';
 import { UpdatePatientRequest } from '../model/patient';
-import { planPatientUpdate } from '../model/patient-update';
+import { planPatientUpdate } from './patient-update-demo';
 import { PATIENT_FIXTURES } from './patients.mock';
 
 describe('HU-PAT-001 dummy patient update', () => {
@@ -201,5 +203,12 @@ describe('HU-PAT-001 dummy patient update', () => {
       jasmine.clock().mockDate(new Date('2026-10-11T05:05:00Z'));
       expect(update({ expectedVersion: 1, birthDate: '2026-10-10' }).ok).toBeTrue();
     } finally { jasmine.clock().uninstall(); }
+  });
+  it('tracks changes to the same email validator used by creation', () => {
+    spyOn(Validators, 'email').and.returnValue({ email: true });
+    const creation = createPatientCreationForm(); creation.controls.email.setValue('new@example.com');
+    expect(creation.controls.email.invalid).toBeTrue();
+    expect(update({ expectedVersion: 1, email: 'new@example.com' }))
+      .toEqual({ ok: false, error: 'INVALID_UPDATE' });
   });
 });

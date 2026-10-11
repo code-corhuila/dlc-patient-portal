@@ -1,14 +1,13 @@
-import { EmergencyContact, Patient, UpdatePatientRequest } from './patient';
-import { PATIENT_CREATION_FIELDS } from './patient-creation-contract';
-import { isPastBirthDate } from './patient-registration';
+import { FormControl, Validators } from '@angular/forms';
+import { EmergencyContact, Patient, UpdatePatientRequest } from '../model/patient';
+import { PATIENT_CREATION_FIELDS } from '../model/patient-creation-contract';
+import { isPastBirthDate } from '../model/patient-registration';
 
 export type UpdateResult = { ok: true; patient: Patient } | { ok: false;
   error: 'NOT_FOUND' | 'STALE_VERSION' | 'INVALID_UPDATE' | 'DOCUMENT_EXISTS' };
 const invalid = (): UpdateResult => ({ ok: false, error: 'INVALID_UPDATE' });
 const fields = PATIENT_CREATION_FIELDS.filter(field => !field.key.startsWith('emergency'));
 const allowed = new Set<string>([...fields.map(field => field.key), 'emergencyContacts', 'expectedVersion']);
-// Same syntax as the existing Angular email validator; this is a demo policy, not server validation.
-const emailPattern = /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 export const documentKey = (type: string, number: string) =>
   JSON.stringify([type.trim().toUpperCase(), number.trim().toUpperCase()]);
 
@@ -35,7 +34,7 @@ function administrativeText(key: string, value: unknown): string | null {
   const field = fields.find(candidate => candidate.key === key)!;
   const text = value.trim();
   if (!text || text.length > (field.max ?? Infinity)) return null;
-  if (key === 'email' && !emailPattern.test(text)) return null;
+  if (key === 'email' && Validators.email(new FormControl(text)) !== null) return null;
   if (key === 'birthDate' && !isPastBirthDate(text)) return null;
   return text;
 }
@@ -57,7 +56,7 @@ function parseChanges(request: UpdatePatientRequest): Partial<Patient> | null {
   return changes;
 }
 
-// Pure in-memory update planning. Identity/status/audit fields are never writable through this contract.
+// TD-PAT-001: fixture-only simulation; remove before binding owner HTTP responses (ADR-003).
 export function planPatientUpdate(current: Patient, request: UpdatePatientRequest,
   patients: readonly Patient[]): UpdateResult {
   if (!request || typeof request !== 'object' || !Number.isInteger(request.expectedVersion) ||

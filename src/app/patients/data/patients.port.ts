@@ -1,7 +1,7 @@
 import { InjectionToken, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CreatePatientRequest, Patient, UpdatePatientRequest } from '../model/patient';
-import { UpdateResult } from '../model/patient-update';
+import { UpdateResult } from './patient-update-demo';
 import { PatientsMockService } from './patients-mock.service';
 
 export type RegistrationResult = { ok: true; patient: Patient } | { ok: false; error: 'DOCUMENT_EXISTS' };

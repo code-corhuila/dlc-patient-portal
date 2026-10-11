@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { CreatePatientRequest, Patient, UpdatePatientRequest } from '../model/patient';
-import { documentKey, planPatientUpdate, UpdateResult } from '../model/patient-update';
+import { documentKey, planPatientUpdate, UpdateResult } from './patient-update-demo';
 import { PATIENT_FIXTURES } from './patients.mock';
 import type { PatientsPort, RegistrationResult } from './patients.port';
 
