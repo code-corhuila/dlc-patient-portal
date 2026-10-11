@@ -36,7 +36,7 @@ export class PortalFrame {
 
   returnToPatients(): Promise<void> { return this.navigate('/app/patients'); }
 
-  canLeave(): boolean { return this.registration?.canLeave() ?? true; }
+  canLeave(): Promise<boolean> { return this.registration?.canLeave() ?? Promise.resolve(true); }
 
   async navigate(path: string): Promise<void> {
     const revision = this.session().revision;

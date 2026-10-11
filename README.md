@@ -13,6 +13,8 @@ The package and Angular project use the approved component name `dlc-patient-por
 
 The composed frame consumes the shell session and shows an explicit fictional list for Administrator/Assistant. It accepts the shell's `q` query and delegates 404 recovery through shell navigation. Dentist assignment fixtures, owner APIs and shell registration remain pending. See [navigation evidence](docs/hu-pat-001-composition-navigation.md).
 
+The `/new` local route supports administrative dummy registration, optional address/emergency contact and unsaved-change confirmation. Its store lasts only for the mounted Angular application; reload or full unmount resets it. See [registration evidence](docs/hu-pat-001-dummy-registration.md).
+
 ## Local CI checks
 
 Use Node 22.x. After `npm ci`, run `npm run test:coverage` and `npm run build`. Coverage checks enforce 80% globally and 90% lines for the patient projection/domain patterns. Reports are written to `coverage/dlc-patient-portal/`; the build also produces the composition entry through `postbuild`.

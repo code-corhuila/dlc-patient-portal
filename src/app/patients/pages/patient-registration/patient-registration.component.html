@@ -1,6 +1,7 @@
 <section class="pat-registration">
   <h1>Register patient</h1>
-  <p>Fictional data only. Changes are stored in this mounted demo, without an API.</p>
+  <p>Fictional data only. Changes are stored in this mounted demo, without an API.
+    Emergency contact is optional; complete all three fields if provided.</p>
   <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <div class="pat-fields">
       @for (field of fields; track field.key) {
@@ -21,4 +22,9 @@
       <button type="button" (click)="cancelled.emit()">Back to patients</button>
     </div>
   </form>
+  <dialog #leaveDialog aria-labelledby="pat-leave-title" (cancel)="$event.preventDefault(); decideLeave(false)">
+    <h2 id="pat-leave-title">Discard unsaved patient changes?</h2>
+    <button type="button" (click)="decideLeave(false)">Keep editing</button>
+    <button type="button" (click)="decideLeave(true)">Discard changes</button>
+  </dialog>
 </section>
