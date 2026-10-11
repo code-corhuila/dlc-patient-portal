@@ -7,10 +7,13 @@
     "build": "ng build",
     "postbuild": "npm run build:portal",
     "build:portal": "ng build --configuration portal && node scripts/prepare-portal-entry.mjs",
+    "build:demo": "npm run build:portal && node scripts/prepare-demo-release.mjs",
+    "recover:demo": "node scripts/prepare-demo-release.mjs --recover",
+    "serve:demo": "node scripts/demo-server.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:coverage": "ng test --watch=false --browsers=ChromeHeadless --code-coverage && npm run test:packaging",
-    "test:packaging": "node --test scripts/prepare-portal-entry.spec.mjs"
+    "test:packaging": "node --test scripts/prepare-portal-entry.spec.mjs scripts/demo-delivery.spec.mjs"
   },
   "prettier": {
     "printWidth": 100,
