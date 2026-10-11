@@ -221,4 +221,16 @@ describe('PatientFormComponent contract', () => {
       expect(component.form.valid).toBeFalse();
     });
   }
+  it('edits a partial read profile without requiring untouched missing fields', () => {
+    const fixture = TestBed.createComponent(PatientFormComponent);
+    fixture.componentRef.setInput('mode', 'edit');
+    fixture.componentRef.setInput('initialValue', { documentType: 'CC', name: 'Patient', phone: '300' });
+    fixture.componentInstance.form.controls.phone.setValue('301');
+    expect(fixture.componentInstance.form.valid).toBeTrue();
+    fixture.componentInstance.form.controls.phone.setValue('');
+    expect(fixture.componentInstance.form.valid).toBeFalse();
+    fixture.componentInstance.form.controls.phone.setValue('301');
+    fixture.componentInstance.form.controls.birthDate.setValue('2999-01-01');
+    expect(fixture.componentInstance.form.valid).toBeFalse();
+  });
 });

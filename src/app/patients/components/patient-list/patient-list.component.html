@@ -13,6 +13,7 @@
             <th scope="col">Phone</th>
             <th scope="col">Email</th>
             <th scope="col">Status</th>
+            @if (editable) { <th scope="col">Actions</th> }
           </tr>
         </thead>
 
@@ -30,6 +31,7 @@
               <td>{{ patient.email ?? '—' }}</td>
 
               <td>{{ patient.status }}</td>
+              @if (editable) { <td><button type="button" data-edit [attr.aria-label]="'Edit ' + patient.name" (click)="edit.emit(patient.id)">Edit</button></td> }
             </tr>
           }
         </tbody>

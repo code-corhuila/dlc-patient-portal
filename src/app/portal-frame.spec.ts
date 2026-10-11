@@ -160,4 +160,29 @@ describe('HU-PAT-001 composed dummy navigation and session', () => {
     expect(await forced).toBeFalse();
     expect(await fixture.componentInstance.canLeave()).toBeTrue();
   });
+  it('requests the approved administrative edit path for the selected patient', async () => {
+    render(); fixture.nativeElement.shadowRoot.querySelector('[data-edit]').click();
+    await fixture.whenStable();
+    expect(request).toHaveBeenCalledOnceWith({ path: '/app/patients/profiles/' + patient.id + '/edit' });
+  });
+  it('opens editing over the list and delegates dirty leave to the reusable form', async () => {
+    context = { ...context, route: { ...context.route, localPath: '/profiles/' + patient.id + '/edit' } };
+    TestBed.overrideProvider(PORTAL_CONTEXT, { useValue: context });
+    TestBed.overrideProvider(PatientsMockService, { useValue: new PatientsMockService() });
+    render(); const root = fixture.nativeElement.shadowRoot;
+    expect(root.querySelector('table')).not.toBeNull(); expect(root.querySelector('dialog[open]')).not.toBeNull();
+    const input = root.querySelector('#patient-name'); input.value = 'Unsaved'; input.dispatchEvent(new Event('input'));
+    fixture.detectChanges(); const leave = fixture.componentInstance.canLeave();
+    root.querySelector('[data-keep]').click(); expect(await leave).toBeFalse();
+    const forced = fixture.componentInstance.canLeave();
+    notify({ ...snapshot, state: 'expired', user: null, revision: 2 }); fixture.detectChanges();
+    expect(await forced).toBeFalse(); expect(root.querySelector('app-patient-edit')).toBeNull();
+  });
+  it('does not render the edit route for Dentist', () => {
+    context = { ...context, route: { ...context.route, localPath: '/profiles/' + patient.id + '/edit' } };
+    snapshot = { ...snapshot, user: { ...snapshot.user!, roles: ['DENTIST'] } };
+    TestBed.overrideProvider(PORTAL_CONTEXT, { useValue: context }); render();
+    expect(fixture.nativeElement.shadowRoot.querySelector('app-patient-edit')).toBeNull();
+    expect(getPatients).not.toHaveBeenCalled();
+  });
 });
