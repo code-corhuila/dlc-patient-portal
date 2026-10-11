@@ -1,21 +1,8 @@
 import { Component, DestroyRef, ElementRef, EventEmitter, inject, Output, signal, ViewChild } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { PatientsMockService } from '../../data/patients-mock.service';
-import { clinicToday, isPastBirthDate } from '../../model/patient-registration';
-
-const FIELDS = [
-  { key: 'documentType', label: 'Document type', type: 'text', max: 30, required: true },
-  { key: 'documentNumber', label: 'Document number', type: 'text', max: 50, required: true },
-  { key: 'name', label: 'Full name', type: 'text', max: 255, required: true },
-  { key: 'birthDate', label: 'Birth date', type: 'date', max: 0, required: true },
-  { key: 'phone', label: 'Phone', type: 'tel', max: 40, required: true },
-  { key: 'email', label: 'Email', type: 'email', max: 255, required: true },
-  { key: 'address', label: 'Address (optional)', type: 'text', max: 500, required: false },
-  { key: 'emergencyName', label: 'Emergency contact name', type: 'text', max: 255, required: false },
-  { key: 'emergencyRelationship', label: 'Contact relationship', type: 'text', max: 80, required: false },
-  { key: 'emergencyPhone', label: 'Contact phone', type: 'tel', max: 40, required: false },
-] as const;
-type Controls = Record<typeof FIELDS[number]['key'], FormControl<string>>;
+import { PATIENT_CREATION_FIELDS } from '../../model/patient-creation-contract';
+import { createPatientCreationForm, toPatientCreationRequest } from '../../components/patient-form/patient-creation-form';
 
 @Component({
   selector: 'app-patient-registration', standalone: true, imports: [ReactiveFormsModule],
@@ -25,23 +12,13 @@ export class PatientRegistrationComponent {
   @ViewChild('leaveDialog') private leaveDialog?: ElementRef<HTMLDialogElement>;
   private leaveDecision?: (allowed: boolean) => void;
   private readonly store = inject(PatientsMockService);
-  readonly fields = FIELDS;
+  readonly fields = PATIENT_CREATION_FIELDS;
   readonly submitted = signal(false);
   readonly saved = signal(false);
   readonly error = signal('');
   @Output() readonly registered = new EventEmitter<void>();
   @Output() readonly cancelled = new EventEmitter<void>();
-  readonly form = new FormGroup(Object.fromEntries(FIELDS.map(field => [field.key,
-    new FormControl('', { nonNullable: true, validators: [
-      ...(field.required ? [Validators.required] : []), Validators.maxLength(field.max || Infinity),
-      ...(field.type === 'email' ? [Validators.email] : []),
-      ...(field.type === 'date' ? [(control: AbstractControl) => isPastBirthDate(control.value, clinicToday()) ? null : { pastDate: true }] : []),
-    ] }),
-  ])) as Controls, { validators: (control: AbstractControl) => {
-    const values = ['emergencyName', 'emergencyRelationship', 'emergencyPhone']
-      .map(key => control.value[key].trim());
-    return values.some(Boolean) && values.some(value => !value) ? { emergencyContact: true } : null;
-  } });
+  readonly form = createPatientCreationForm();
 
   constructor() { inject(DestroyRef).onDestroy(() => this.decideLeave(false)); }
 
@@ -55,10 +32,7 @@ export class PatientRegistrationComponent {
         'Review the required fields, limits and past birth date.');
       return;
     }
-    const { address, emergencyName, emergencyRelationship, emergencyPhone, ...required } = this.form.getRawValue();
-    const request = { ...required, ...(address ? { address } : {}), ...(emergencyName ? {
-      emergencyContacts: [{ name: emergencyName, relationship: emergencyRelationship, phone: emergencyPhone }],
-    } : {}) };
+    const request = toPatientCreationRequest(this.form.getRawValue());
     try {
       const result = this.store.register(request);
       if (!result.ok) { this.error.set('A patient with this document already exists in this demo.'); return; }
