@@ -136,4 +136,28 @@ describe('HU-PAT-001 composed dummy navigation and session', () => {
     await pending;
     expect(fixture.componentInstance.navigationFailed()).toBeFalse();
   });
+
+  it('requests registration through the shell and protects an unsaved form', async () => {
+    render();
+    fixture.nativeElement.shadowRoot.querySelector('button').click();
+    await fixture.whenStable();
+    expect(request).toHaveBeenCalledOnceWith({ path: '/app/patients/new' });
+    fixture.componentInstance.route.set({ ...context.route, localPath: '/new' });
+    fixture.detectChanges();
+    const input = fixture.nativeElement.shadowRoot.querySelector('#pat-name');
+    input.value = 'Unsaved demo';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    const pending: Promise<boolean> = fixture.componentInstance.canLeave();
+    const dialog = fixture.nativeElement.shadowRoot.querySelector('dialog');
+    expect(dialog.open).toBeTrue();
+    dialog.querySelector('button').click();
+    expect(await pending).toBeFalse();
+    const forced: Promise<boolean> = fixture.componentInstance.canLeave();
+    notify({ ...snapshot, state: 'expired', user: null, revision: 2 });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.shadowRoot.querySelector('form')).toBeNull();
+    expect(await forced).toBeFalse();
+    expect(await fixture.componentInstance.canLeave()).toBeTrue();
+  });
 });

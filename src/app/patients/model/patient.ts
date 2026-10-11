@@ -38,3 +38,7 @@ export interface PatientPage {
   data: PatientView[];
   meta: PaginatedMeta;
 }
+
+export type CreatePatientRequest = Required<Pick<Patient,
+  'documentType' | 'documentNumber' | 'name' | 'birthDate' | 'phone' | 'email'>> &
+  Pick<Patient, 'address' | 'emergencyContacts'>;
