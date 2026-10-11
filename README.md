@@ -15,6 +15,12 @@ The composed frame consumes the shell session and shows an explicit fictional li
 
 The `/new` local route supports administrative dummy registration, optional address/emergency contact and unsaved-change confirmation. Its store lasts only for the mounted Angular application; reload or full unmount resets it. See [registration evidence](docs/hu-pat-001-dummy-registration.md).
 
+## Demo delivery for dlc-front
+
+From a clean checkout, run `npm run build:demo`, then `npm run serve:demo` for versioned assets on localhost:4177. This serves `entry.js`, not a standalone page. For containers, start Docker and run `docker compose -f deploy/compose.yml up --build -d`. Existing release folders are immutable; select a new release with `npm run build:demo -- 0.1.1-demo`.
+
+The generated `dist/demo/patient-descriptor.json` supplies the Patients descriptor to the front team. Registry/proxy registration and browser integration remain pending in dlc-front. See [delivery contract and evidence](docs/hu-pat-001-demo-delivery.md).
+
 ## Local CI checks
 
 Use Node 22.x. After `npm ci`, run `npm run test:coverage` and `npm run build`. Coverage checks enforce 80% globally and 90% lines for the patient projection/domain patterns. Reports are written to `coverage/dlc-patient-portal/`; the build also produces the composition entry through `postbuild`.
