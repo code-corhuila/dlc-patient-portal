@@ -1,11 +1,29 @@
 <main class="patients-page">
-  <header>
-    <h1>Patient administration</h1>
-
-    <p>
-      Demonstration using fictional patient data.
-    </p>
+  <header class="page-header">
+    <div>
+      <h1>Gestión de Pacientes</h1>
+      <p>Registro y consulta de expedientes de pacientes en el Consultorio Dental DI-LUCCA</p>
+      <span class="demo-notice">Datos ficticios de demostración</span>
+    </div>
+    <button class="primary-button" type="button" data-new-patient (click)="add.emit()">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" d="M15 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M8.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM19 8v6M22 11h-6"/></svg>
+      Nuevo Paciente
+    </button>
   </header>
+
+  <section class="toolbar" aria-label="Filtros de pacientes">
+    <label class="search">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" d="m21 21-4.3-4.3M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z"/></svg>
+      <input type="search" aria-label="Buscar pacientes" placeholder="Buscar por nombre, apellido o número de documento..."
+        [value]="query" (input)="query = $any($event.target).value" />
+    </label>
+    <label class="toggle">
+      <input type="checkbox" [checked]="onlyActive" (change)="onlyActive = $any($event.target).checked" />
+      <span>Solo Pacientes Activos</span>
+    </label>
+  </section>
 
   <app-patient-list
     [patients]="visiblePatients" [editable]="editable" (edit)="edit.emit($event)"

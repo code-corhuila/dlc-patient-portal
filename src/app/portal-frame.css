@@ -1,3 +1,62 @@
+/* Mock-up tokens (dlc-docs 12-ux-ui, pages 5-6). Custom properties cross into child components. */
 :host {
+  --pat-primary: #138a86;
+  --pat-primary-strong: #0f716e;
+  --pat-primary-soft: #e3f4f3;
+  --pat-surface: #fff;
+  --pat-background: #f5f7fa;
+  --pat-border: #e6e9ef;
+  --pat-border-strong: #d4d9e1;
+  --pat-text: #111827;
+  --pat-muted: #8a94a6;
+  --pat-muted-strong: #4b5563;
+  --pat-chip: #eef0f3;
+  --pat-row-hover: #fafbfc;
+  --pat-danger: #b42318;
+  --pat-danger-soft: #fdecea;
+  --pat-warning: #93600a;
+  --pat-warning-soft: #fdf3dc;
+  --pat-overlay: rgb(17 24 39 / 45%);
+
   display: block;
+  min-height: 100%;
+  background: transparent;
+  color: var(--pat-text);
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.notice {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+  padding: 2rem;
+}
+
+.notice h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.notice p {
+  margin: 0;
+  color: var(--pat-muted-strong);
+}
+
+.primary-button {
+  padding: 0.7rem 1.1rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--pat-primary);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.navigation-error {
+  margin: 0 2rem 2rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: var(--pat-danger-soft);
+  color: var(--pat-danger);
 }

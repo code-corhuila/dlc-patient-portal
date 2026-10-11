@@ -1,13 +1,119 @@
 .patients-page {
   display: grid;
   gap: 1.5rem;
-  padding: 1.5rem;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 0.25rem 0.5rem 1rem;
 }
 
-.patients-page h1 {
-  margin: 0;
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
-.patients-page p {
+.page-header h1 {
+  margin: 0 0 0.35rem;
+  color: var(--pat-text);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.page-header p {
   margin: 0;
+  color: var(--pat-muted-strong);
+  font-size: 0.9rem;
+}
+
+.demo-notice {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--pat-warning-soft);
+  color: var(--pat-warning);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.1rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--pat-primary);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-button:hover,
+.primary-button:focus-visible {
+  background: var(--pat-primary-strong);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--pat-border);
+  border-radius: 12px;
+  background: var(--pat-surface);
+  box-shadow: 0 1px 2px rgb(16 24 40 / 5%);
+}
+
+.search {
+  display: flex;
+  flex: 1 1 22rem;
+  max-width: 30rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--pat-border-strong);
+  border-radius: 8px;
+  color: var(--pat-muted);
+}
+
+.search:focus-within {
+  border-color: var(--pat-primary);
+  box-shadow: 0 0 0 3px var(--pat-primary-soft);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--pat-text);
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--pat-text);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.toggle input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--pat-primary);
+}
+
+@media (max-width: 640px) {
+  .patients-page { padding: 1rem; }
+  .primary-button { width: 100%; justify-content: center; }
 }

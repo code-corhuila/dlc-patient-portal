@@ -1,53 +1,81 @@
-<main class="patient-form-page">
-  <header>
-    <button class="back-link" type="button" [disabled]="busy" (click)="cancel.emit()">Back to patients</button>
+<div class="patient-form-page">
+  <header class="modal-header">
     <h1>{{ title }}</h1>
-    <p>Fictional administrative data only. No information is sent to an API.</p>
+    <button class="close-button" type="button" aria-label="Cerrar" [disabled]="busy" (click)="cancel.emit()">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
   </header>
   <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-    <p data-error-summary tabindex="-1" role="alert">{{ form.touched && form.invalid ? 'Check the highlighted fields before saving.' : '' }}</p>
-    <div class="form-grid">
-      @for (field of fields; track field.key) {
-        <label class="field" [for]="'patient-' + field.key">
+    <p class="error-summary" data-error-summary tabindex="-1" role="alert">{{ form.touched && form.invalid ? 'Revisa los campos marcados antes de guardar.' : '' }}</p>
+    <div class="pat-fields">
+      @for (field of profileFields; track field.key) {
+        <label class="field" [class.wide]="wideFields.has(field.key)" [for]="'patient-' + field.key">
           <span>{{ field.label }}{{ mode === 'create' && field.required ? ' *' : '' }}</span>
           <input [id]="'patient-' + field.key" [type]="field.type" [readOnly]="busy || saved" [formControlName]="field.key"
             [attr.maxlength]="field.max" [attr.required]="mode === 'create' && field.required ? '' : null"
+            [attr.placeholder]="placeholders[field.key] ?? null"
+            [attr.list]="field.key === 'documentType' ? 'patient-document-types' : null"
             [attr.aria-invalid]="form.controls[field.key].touched && form.controls[field.key].invalid"
             [attr.aria-describedby]="'patient-error-' + field.key" />
           <span [id]="'patient-error-' + field.key" class="field-error">
             @if (form.controls[field.key].touched && form.controls[field.key].invalid) {
-              Enter a valid {{ field.label.toLowerCase() }} within the allowed length.
-              @if (field.key === 'birthDate') { Use a valid past date. }
+              Ingresa un valor válido para {{ field.label.toLowerCase() }} dentro del límite permitido.
+              @if (field.key === 'birthDate') { Usa una fecha pasada válida. }
             }
           </span>
         </label>
       }
     </div>
+    <datalist id="patient-document-types">
+      @for (type of documentTypes; track type.value) { <option [value]="type.value">{{ type.label }}</option> }
+    </datalist>
+    <fieldset class="contact">
+      <legend>Contacto de emergencia (opcional)</legend>
+      <div class="pat-fields contact-fields">
+        @for (field of contactFields; track field.key) {
+          <label class="field" [for]="'patient-' + field.key">
+            <span>{{ field.label }}</span>
+            <input [id]="'patient-' + field.key" [type]="field.type" [readOnly]="busy || saved" [formControlName]="field.key"
+              [attr.maxlength]="field.max"
+              [attr.aria-invalid]="form.controls[field.key].touched && form.controls[field.key].invalid"
+              [attr.aria-describedby]="'patient-error-' + field.key" />
+            <span [id]="'patient-error-' + field.key" class="field-error">
+              @if (form.controls[field.key].touched && form.controls[field.key].invalid) { Dentro del límite permitido. }
+            </span>
+          </label>
+        }
+      </div>
+    </fieldset>
     <div formArrayName="additionalContacts">
       @for (contact of form.controls.additionalContacts.controls; track contact; let i = $index) {
-        <fieldset [formGroupName]="i" [disabled]="busy || saved">
-          <legend>Additional emergency contact {{ i + 1 }}</legend>
-          <label class="field">Name <input formControlName="name" [attr.maxlength]="contactLimits.name" /></label>
-          <label class="field">Relationship <input formControlName="relationship" [attr.maxlength]="contactLimits.relationship" /></label>
-          <label class="field">Phone <input type="tel" formControlName="phone" [attr.maxlength]="contactLimits.phone" /></label>
-          <button type="button" (click)="form.controls.additionalContacts.removeAt(i); form.markAsDirty()">Remove contact</button>
+        <fieldset class="contact" [formGroupName]="i" [disabled]="busy || saved">
+          <legend>Contacto de emergencia adicional {{ i + 1 }}</legend>
+          <div class="pat-fields contact-fields">
+            <label class="field">Nombre <input formControlName="name" [attr.maxlength]="contactLimits.name" /></label>
+            <label class="field">Parentesco <input formControlName="relationship" [attr.maxlength]="contactLimits.relationship" /></label>
+            <label class="field">Teléfono <input type="tel" formControlName="phone" [attr.maxlength]="contactLimits.phone" /></label>
+          </div>
+          <button class="link-button" type="button" (click)="form.controls.additionalContacts.removeAt(i); form.markAsDirty()">Quitar contacto</button>
         </fieldset>
       }
     </div>
-    <button type="button" [disabled]="busy || saved" (click)="addContact()">Add another emergency contact</button>
+    <button class="link-button" type="button" [disabled]="busy || saved" (click)="addContact()">+ Agregar otro contacto de emergencia</button>
     @if (form.touched && form.hasError('emergencyContact')) {
-      <p role="alert">Complete the name, relationship and phone of the emergency contact.</p>
+      <p class="form-error" role="alert">Completa el nombre, parentesco y teléfono del contacto de emergencia.</p>
     }
-    @if (failure) { <p role="alert">{{ failure }}</p> }
-    @if (saved) { <p role="status">Changes saved in this local demo.</p> }
-    <footer class="form-actions">
-      <button class="cancel-button" type="button" [disabled]="busy" (click)="cancel.emit()">Cancel</button>
-      <button class="save-button" type="submit" [disabled]="saved || busy">Save patient</button>
+    @if (failure) { <p class="form-error" role="alert">{{ failure }}</p> }
+    @if (saved) { <p class="form-success" role="status">Cambios guardados en esta demo local.</p> }
+    <footer class="pat-actions">
+      <button class="secondary-button cancel-button" type="button" [disabled]="busy" (click)="cancel.emit()">Cancelar</button>
+      <button class="primary-button save-button" type="submit" [disabled]="saved || busy">Guardar Paciente</button>
     </footer>
   </form>
-</main>
-<dialog #leaveDialog aria-labelledby="patient-leave-title" (cancel)="$event.preventDefault(); answerLeave(false)">
-  <h2 id="patient-leave-title">Discard unsaved changes?</h2>
-  <button type="button" data-keep (click)="answerLeave(false)">Keep editing</button>
-  <button type="button" (click)="answerLeave(true)">Discard changes</button>
+</div>
+<dialog class="leave-dialog" #leaveDialog aria-labelledby="patient-leave-title" (cancel)="$event.preventDefault(); answerLeave(false)">
+  <h2 id="patient-leave-title">¿Descartar los cambios sin guardar?</h2>
+  <div class="pat-actions">
+    <button class="secondary-button" type="button" data-keep (click)="answerLeave(false)">Seguir editando</button>
+    <button class="danger-button" type="button" (click)="answerLeave(true)">Descartar cambios</button>
+  </div>
 </dialog>
