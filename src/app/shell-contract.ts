@@ -16,8 +16,14 @@ export interface PortalContext {
   readonly compositionId: string;
   readonly route: PortalRoute;
   readonly signal: AbortSignal;
-  readonly navigation: unknown;
-  readonly session: unknown;
+  readonly navigation: {
+    request(target: { path: string; replace?: boolean }):
+      Promise<{ status: 'applied' | 'cancelled' | 'rejected' }>;
+  };
+  readonly session: {
+    getSnapshot(): SessionSnapshot;
+    subscribe(listener: (snapshot: SessionSnapshot) => void): () => void;
+  };
   readonly http: unknown;
   readonly reportFailure: (failure: {
     code: 'PORTAL_RENDER_FAILED' | 'PORTAL_TASK_FAILED';
@@ -31,3 +37,12 @@ export interface PortalHandle {
 }
 
 export const PORTAL_CONTEXT = new InjectionToken<PortalContext>('patient.portal-context');
+
+export interface SessionSnapshot {
+  readonly state: 'resolving' | 'authenticated' | 'anonymous' | 'expired' | 'unavailable';
+  readonly revision: number;
+  readonly user: { readonly id: string; readonly name: string; readonly roles: readonly string[] } | null;
+  readonly permissions: readonly string[];
+  readonly expiresAt: string | null;
+  readonly reason: null | 'NO_SESSION' | 'EXPIRED' | 'UNAUTHORIZED' | 'LOGOUT' | 'DEPENDENCY_UNAVAILABLE';
+}
