@@ -5,7 +5,7 @@ import { CreatePatientRequest, Patient } from '../../model/patient';
 import { patientEditRequest } from '../../model/patient-edit-request';
 
 @Component({ selector: 'app-patient-edit', standalone: true, imports: [PatientFormComponent],
-  templateUrl: './patient-edit.component.html' })
+  templateUrl: './patient-edit.component.html', styleUrl: '../../components/patient-form/patient-modal.css' })
 export class PatientEditComponent implements OnChanges, AfterViewInit {
   @Input() patientId = '';
   @Input() allowed = false;
@@ -26,9 +26,9 @@ export class PatientEditComponent implements OnChanges, AfterViewInit {
   private load(): void {
     this.changes.markForCheck();
     this.patient = undefined; this.saved = false; this.conflict = false;
-    if (!this.allowed || !this.alive) { this.failure = 'Administrative editing is unavailable for this role.'; return; }
-    try { this.patient = this.patients.getPatient(this.patientId); this.failure = this.patient ? '' : 'Patient not found.'; }
-    catch { this.failure = 'The demo could not load the patient.'; }
+    if (!this.allowed || !this.alive) { this.failure = 'La edición administrativa no está disponible para este rol.'; return; }
+    try { this.patient = this.patients.getPatient(this.patientId); this.failure = this.patient ? '' : 'Paciente no encontrado.'; }
+    catch { this.failure = 'La demo no pudo cargar el paciente.'; }
   }
   async reload(): Promise<void> {
     const id = this.patientId;
@@ -38,19 +38,19 @@ export class PatientEditComponent implements OnChanges, AfterViewInit {
   private canSave(): boolean { return this.allowed && this.alive && !this.busy && !this.saved; }
   save(draft: CreatePatientRequest): void {
     const current = this.patient; if (!current || !this.canSave()) return;
-    if (current.address && !draft.address?.trim()) { this.failure = 'The approved contract does not support clearing address.'; return; }
+    if (current.address && !draft.address?.trim()) { this.failure = 'El contrato aprobado no permite borrar la dirección.'; return; }
     try {
       const request = patientEditRequest(current, draft);
-      if (!request) { this.failure = 'No changes to save.'; return; }
+      if (!request) { this.failure = 'No hay cambios para guardar.'; return; }
       this.busy = true; this.failure = ''; this.conflict = false;
       const result = this.patients.updatePatient(this.patientId, request);
       if (result.ok) { this.saved = true; this.finished.emit(); }
       else {
         this.conflict = result.error === 'STALE_VERSION';
-        this.failure = ({ STALE_VERSION: 'The patient changed. Reload before retrying.', NOT_FOUND: 'Patient not found.',
-          DOCUMENT_EXISTS: 'A patient with this document already exists.', INVALID_UPDATE: 'Review the changed administrative fields.' })[result.error];
+        this.failure = ({ STALE_VERSION: 'El paciente cambió. Recarga antes de reintentar.', NOT_FOUND: 'Paciente no encontrado.',
+          DOCUMENT_EXISTS: 'Ya existe un paciente con este documento.', INVALID_UPDATE: 'Revisa los campos administrativos modificados.' })[result.error];
       }
-    } catch { this.failure = 'The demo could not update the patient.'; }
+    } catch { this.failure = 'La demo no pudo actualizar el paciente.'; }
     finally { this.busy = false; this.changes.markForCheck(); }
   }
 }

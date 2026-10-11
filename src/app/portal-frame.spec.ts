@@ -53,7 +53,7 @@ describe('HU-PAT-001 composed dummy navigation and session', () => {
   it('renders the explicit dummy list for Administrator and Assistant', () => {
     render();
     expect(text()).toContain(patient.name);
-    expect(text()).toContain('fictional patient data');
+    expect(text()).toContain('Datos ficticios de demostración');
     notify({ ...snapshot, revision: 2, user: { ...snapshot.user!, roles: ['SECRETARY_ASSISTANT'] } });
     fixture.detectChanges();
     expect(text()).toContain(patient.name);
@@ -81,7 +81,7 @@ describe('HU-PAT-001 composed dummy navigation and session', () => {
     render();
     fixture.componentInstance.route.set({ ...context.route, query: { q: [' NO MATCH '] } });
     fixture.detectChanges();
-    expect(text()).toContain('No patients available.');
+    expect(text()).toContain('No se encontraron pacientes.');
     fixture.componentInstance.route.set({ ...context.route, query: { q: [' 1000000001 '] } });
     fixture.detectChanges();
     expect(text()).toContain(patient.name);
@@ -108,7 +108,7 @@ describe('HU-PAT-001 composed dummy navigation and session', () => {
     await fixture.whenStable();
     expect(request).toHaveBeenCalledOnceWith({ path: '/app/patients' });
     expect(location.href).toBe(before);
-    expect(text()).toContain('Page not found.');
+    expect(text()).toContain('Página no encontrada.');
   });
 
   it('shows a safe navigation failure and clears it after cancellation', async () => {
@@ -116,7 +116,7 @@ describe('HU-PAT-001 composed dummy navigation and session', () => {
     request.and.rejectWith(new Error('Sensitive detail'));
     await fixture.componentInstance.returnToPatients();
     fixture.detectChanges();
-    expect(text()).toContain('Navigation could not be applied.');
+    expect(text()).toContain('No se pudo aplicar la navegación.');
     expect(text()).not.toContain('Sensitive detail');
     request.and.resolveTo({ status: 'rejected' });
     await fixture.componentInstance.returnToPatients();
@@ -144,6 +144,9 @@ describe('HU-PAT-001 composed dummy navigation and session', () => {
     expect(request).toHaveBeenCalledOnceWith({ path: '/app/patients/new' });
     fixture.componentInstance.route.set({ ...context.route, localPath: '/new' });
     fixture.detectChanges();
+    const modal = fixture.nativeElement.shadowRoot.querySelector('[role=dialog][aria-modal=true]');
+    expect(modal.textContent).toContain('Registrar Nuevo Paciente');
+    expect(fixture.nativeElement.shadowRoot.querySelector('table')).not.toBeNull();
     const input = fixture.nativeElement.shadowRoot.querySelector('#pat-name');
     input.value = 'Unsaved demo';
     input.dispatchEvent(new Event('input'));

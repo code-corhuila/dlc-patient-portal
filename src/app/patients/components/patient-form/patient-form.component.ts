@@ -3,11 +3,12 @@ import { FormArray, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn } f
 import { CreatePatientRequest } from '../../model/patient';
 import { PATIENT_CREATION_FIELDS, PatientCreationValues } from '../../model/patient-creation-contract';
 import { createPatientCreationForm, toPatientCreationRequest } from './patient-creation-form';
+import { CONTACT_FIELDS, DOCUMENT_TYPE_SUGGESTIONS, FIELD_PLACEHOLDERS, PROFILE_FIELDS, WIDE_FIELDS } from './patient-form-layout';
 
 const requiredText: ValidatorFn = control => String(control.value).trim() ? null : { required: true };
 @Component({
   selector: 'app-patient-form', standalone: true, imports: [ReactiveFormsModule],
-  templateUrl: './patient-form.component.html', changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './patient-form.component.html', styleUrl: './patient-modal.css', changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PatientFormComponent {
   private readonly core = createPatientCreationForm();
@@ -16,6 +17,11 @@ export class PatientFormComponent {
   private resolveLeave?: (value: boolean) => void;
   private leavePending?: Promise<boolean>;
   readonly fields = PATIENT_CREATION_FIELDS;
+  readonly profileFields = PROFILE_FIELDS;
+  readonly contactFields = CONTACT_FIELDS;
+  readonly wideFields = WIDE_FIELDS;
+  readonly placeholders = FIELD_PLACEHOLDERS;
+  readonly documentTypes = DOCUMENT_TYPE_SUGGESTIONS;
   readonly contactLimits = {
     name: this.fields.find(field => field.key === 'emergencyName')!.max,
     relationship: this.fields.find(field => field.key === 'emergencyRelationship')!.max,
@@ -28,7 +34,7 @@ export class PatientFormComponent {
   private readonly createValidators = Object.fromEntries(this.fields.map(field => [field.key, this.core.controls[field.key].validator]));
   @Input() set mode(value: 'create' | 'edit') { this.editing = value === 'edit'; this.applyMode(); }
   get mode(): 'create' | 'edit' { return this.editing ? 'edit' : 'create'; }
-  @Input() title = 'Add patient';
+  @Input() title = 'Registrar Nuevo Paciente';
   @Input() failure = '';
   @Input() saved = false;
   @Input() busy = false;

@@ -1,18 +1,23 @@
 import { Component, DestroyRef, ElementRef, EventEmitter, inject, Output, signal, ViewChild } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PatientsMockService } from '../../data/patients-mock.service';
-import { PATIENT_CREATION_FIELDS } from '../../model/patient-creation-contract';
+import { CONTACT_FIELDS, DOCUMENT_TYPE_SUGGESTIONS, FIELD_PLACEHOLDERS, PROFILE_FIELDS, WIDE_FIELDS } from '../../components/patient-form/patient-form-layout';
 import { createPatientCreationForm, toPatientCreationRequest } from '../../components/patient-form/patient-creation-form';
 
 @Component({
   selector: 'app-patient-registration', standalone: true, imports: [ReactiveFormsModule],
-  templateUrl: './patient-registration.component.html', styleUrl: './patient-registration.component.css',
+  templateUrl: './patient-registration.component.html',
+  styleUrls: ['../../components/patient-form/patient-modal.css', './patient-registration.component.css'],
 })
 export class PatientRegistrationComponent {
   @ViewChild('leaveDialog') private leaveDialog?: ElementRef<HTMLDialogElement>;
   private leaveDecision?: (allowed: boolean) => void;
   private readonly store = inject(PatientsMockService);
-  readonly fields = PATIENT_CREATION_FIELDS;
+  readonly profileFields = PROFILE_FIELDS;
+  readonly contactFields = CONTACT_FIELDS;
+  readonly wideFields = WIDE_FIELDS;
+  readonly placeholders = FIELD_PLACEHOLDERS;
+  readonly documentTypes = DOCUMENT_TYPE_SUGGESTIONS;
   readonly submitted = signal(false);
   readonly saved = signal(false);
   readonly error = signal('');
@@ -28,18 +33,18 @@ export class PatientRegistrationComponent {
     this.submitted.set(true);
     this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.error.set(this.form.hasError('emergencyContact') ? 'Complete all emergency contact fields or leave them blank.' :
-        'Review the required fields, limits and past birth date.');
+      this.error.set(this.form.hasError('emergencyContact') ? 'Completa todos los datos del contacto de emergencia o déjalos vacíos.' :
+        'Revisa los campos obligatorios, sus límites y que la fecha de nacimiento sea pasada.');
       return;
     }
     const request = toPatientCreationRequest(this.form.getRawValue());
     try {
       const result = this.store.register(request);
-      if (!result.ok) { this.error.set('A patient with this document already exists in this demo.'); return; }
+      if (!result.ok) { this.error.set('Un paciente con este documento ya existe en la demo.'); return; }
       this.error.set('');
       this.saved.set(true);
       this.registered.emit();
-    } catch { this.error.set('The demo could not save the patient. Try again.'); }
+    } catch { this.error.set('La demo no pudo guardar el paciente. Inténtalo de nuevo.'); }
   }
 
   canLeave(): Promise<boolean> {

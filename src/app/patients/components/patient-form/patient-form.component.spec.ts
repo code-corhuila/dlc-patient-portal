@@ -201,8 +201,8 @@ describe('PatientFormComponent contract', () => {
   });
   it('renders the caller title and associates labels and errors with each field', () => {
     const fixture = TestBed.createComponent(PatientFormComponent);
-    fixture.componentRef.setInput('title', 'Edit patient'); fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('h1').textContent).toBe('Edit patient');
+    fixture.componentRef.setInput('title', 'Editar Paciente'); fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('h1').textContent).toBe('Editar Paciente');
     for (const field of fixture.componentInstance.fields) {
       const input = fixture.nativeElement.querySelector('#patient-' + field.key);
       expect(fixture.nativeElement.querySelector('label[for="' + input.id + '"]')).not.toBeNull();
