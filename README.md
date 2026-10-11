@@ -11,7 +11,7 @@ Run `npm run build:portal` to create `dist/dlc-patient-portal/portal/browser/ent
 
 The package and Angular project use the approved component name `dlc-patient-portal`. Packaging reads its output path from Angular configuration; `npm run test:packaging` verifies that behavior. The local folder and Git remote may retain their previous plural name; this change does not rename either or publish a release.
 
-The mounted frame currently reports unavailable domain integration and does not load fixtures. `npm start` and `npm run build` retain the separate standalone development application. See [lifecycle evidence and remaining scope](docs/hu-pat-001-mount-lifecycle.md).
+The composed frame consumes the shell session and shows an explicit fictional list for Administrator/Assistant. It accepts the shell's `q` query and delegates 404 recovery through shell navigation. Dentist assignment fixtures, owner APIs and shell registration remain pending. See [navigation evidence](docs/hu-pat-001-composition-navigation.md).
 
 ## Local CI checks
 

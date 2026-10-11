@@ -1,0 +1,24 @@
+<main class="dlc-patient-portal">
+  @if (session().state !== 'authenticated') {
+    <h1>Patient administration</h1>
+    @if (session().state === 'resolving') {
+      <p role="status">Loading session...</p>
+    } @else if (session().state === 'unavailable') {
+      <p role="alert">Session unavailable.</p>
+    } @else {
+      <p role="status">Sign in through the application to access patients.</p>
+    }
+  } @else if (!canReadAdministrativeDemo()) {
+    <h1>Patient administration</h1>
+    <p role="status">Administrative demo data is unavailable for this role.
+      The assigned-patient Dentist demo is pending.</p>
+  } @else if (route().localPath === '/') {
+    <app-patients-page [search]="route().query['q']?.[0] ?? ''" />
+  } @else {
+    <h1>Page not found.</h1>
+    <button type="button" (click)="returnToPatients()">Back to patients</button>
+  }
+  @if (navigationFailed()) {
+    <p role="alert">Navigation could not be applied.</p>
+  }
+</main>
