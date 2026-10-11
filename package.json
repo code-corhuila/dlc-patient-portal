@@ -8,6 +8,7 @@
     "postbuild": "npm run build:portal",
     "build:portal": "ng build --configuration portal && node scripts/prepare-portal-entry.mjs",
     "build:demo": "npm run build:portal && node scripts/prepare-demo-release.mjs",
+    "recover:demo": "node scripts/prepare-demo-release.mjs --recover",
     "serve:demo": "node scripts/demo-server.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

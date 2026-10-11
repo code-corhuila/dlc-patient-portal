@@ -13,4 +13,6 @@ services:
       timeout: 3s
       retries: 3
     restart: unless-stopped
-# Default network: dlc-patient-portal_default; dlc-front will join it in its own PR.
+networks:
+  default:
+    name: ${PATIENT_NETWORK:-dlc-patient-portal_default}
