@@ -54,7 +54,7 @@ describe('HU-PAT-001 / ADR-011 mount lifecycle', () => {
     try {
       const handle = await open();
       const root = host.querySelector('dlc-patient-root')!;
-      expect(root.shadowRoot!.textContent).toContain('fictional patient data');
+      expect(root.shadowRoot!.textContent).toContain('Datos ficticios de demostración');
       expect(outside.childElementCount).toBe(0);
       expect(await handle.canLeave()).toBeTrue();
       expect(context.reportFailure).not.toHaveBeenCalled();
@@ -111,7 +111,7 @@ describe('HU-PAT-001 / ADR-011 mount lifecycle', () => {
     const handle = await open();
     const before = location.href;
     await handle.updateRoute({ ...context.route, localPath: '/unknown' });
-    expect(host.querySelector('dlc-patient-root')!.shadowRoot!.textContent).toContain('Page not found.');
+    expect(host.querySelector('dlc-patient-root')!.shadowRoot!.textContent).toContain('Página no encontrada.');
     expect(location.href).toBe(before);
     await handle.unmount();
     await expectAsync(handle.updateRoute(context.route)).toBeRejectedWithError('CANCELLED');
@@ -127,7 +127,7 @@ describe('HU-PAT-001 / ADR-011 mount lifecycle', () => {
       await first.unmount();
       await second.updateRoute({ ...context.route, localPath: '/unknown' });
       expect(otherHost.querySelector('dlc-patient-root')!.shadowRoot!.textContent)
-        .toContain('Page not found.');
+        .toContain('Página no encontrada.');
     } finally { otherHost.remove(); }
   });
 

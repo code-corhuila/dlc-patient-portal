@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Patient, PatientForCare } from '../../model/patient';
 import { PatientListComponent } from './patient-list.component';
 
-describe('PatientListComponent', () => {
+describe('PatientListComponent — HU-PAT-001 mock-up table', () => {
   let fixture: ComponentFixture<PatientListComponent>;
   let component: PatientListComponent;
 
@@ -13,12 +13,16 @@ describe('PatientListComponent', () => {
       documentType: 'CC',
       documentNumber: '1000000001',
       name: 'Ana Demo',
+      birthDate: '1990-05-15',
+      address: 'Calle 45 # 12-34',
       phone: '3000000001',
       email: 'ana.demo@example.com',
       status: 'ACTIVE',
       version: 1,
     },
   ];
+  const text = (selector: string) =>
+    [...fixture.nativeElement.querySelectorAll(selector)].map((node: Element) => node.textContent!.trim());
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -29,16 +33,33 @@ describe('PatientListComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should display the provided patients', () => {
+  it('renders the mock-up column headers in Spanish', () => {
     component.patients = patients;
-
     fixture.detectChanges();
 
-    const content = fixture.nativeElement.textContent;
+    expect(text('thead th')).toEqual(['Paciente', 'Documento', 'Teléfono', 'Correo', 'Fecha nac.', 'Estado']);
+  });
 
-    expect(content).toContain('1000000001');
-    expect(content).toContain('Ana');
-    expect(content).toContain('Demo');
+  it('renders avatar, name, address, document chip, contact data, birth date and status', () => {
+    component.patients = patients;
+    fixture.detectChanges();
+
+    const row = fixture.nativeElement.querySelector('tbody tr');
+    expect(row.querySelector('[data-avatar]').textContent.trim()).toBe('AD');
+    expect(row.querySelector('[data-name]').textContent.trim()).toBe('Ana Demo');
+    expect(row.querySelector('[data-address]').textContent.trim()).toBe('Calle 45 # 12-34');
+    expect(row.querySelector('[data-document-type]').textContent.trim()).toBe('CC');
+    expect(row.querySelector('[data-document-number]').textContent.trim()).toBe('1000000001');
+    expect(text('tbody td').slice(2)).toEqual(['3000000001', 'ana.demo@example.com', '1990-05-15', 'Activo']);
+  });
+
+  it('labels inactive patients with a distinct Spanish status badge', () => {
+    fixture.componentRef.setInput('patients', [{ ...patients[0], status: 'INACTIVE' }]);
+    fixture.detectChanges();
+
+    const badge = fixture.nativeElement.querySelector('[data-status]');
+    expect(badge.textContent.trim()).toBe('Inactivo');
+    expect(badge.classList).toContain('status-inactive');
   });
 
   it('renders a care projection without assuming administrative fields exist', () => {
@@ -52,18 +73,33 @@ describe('PatientListComponent', () => {
 
     fixture.detectChanges();
 
-    const cells = fixture.nativeElement.querySelectorAll('tbody td');
-    expect(cells[0].textContent.trim()).toBe('—');
-    expect(cells[1].textContent.trim()).toBe('Ana Demo');
-    expect(cells[2].textContent.trim()).toBe('—');
-    expect(cells[3].textContent.trim()).toBe('—');
+    const cells = text('tbody td');
+    expect(cells[0]).toContain('Ana Demo');
+    expect(fixture.nativeElement.querySelector('[data-address]')).toBeNull();
+    expect(cells[1]).toBe('—');
+    expect(cells[2]).toBe('—');
+    expect(cells[3]).toBe('—');
+    expect(cells[4]).toBe('—');
   });
+
+  it('shows a Spanish empty state', () => {
+    fixture.componentRef.setInput('patients', []);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('No se encontraron pacientes.');
+    expect(fixture.nativeElement.querySelector('table')).toBeNull();
+  });
+
   it('hides editing by default and emits only the selected id when enabled', () => {
     const fixture = TestBed.createComponent(PatientListComponent);
     fixture.componentRef.setInput('patients', [{ id: 'patient-id', documentType: 'CC', name: 'Patient', status: 'ACTIVE', version: 1 }]);
     fixture.detectChanges(); expect(fixture.nativeElement.querySelector('[data-edit]')).toBeNull();
     fixture.componentRef.setInput('editable', true); fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('thead th:last-child').textContent.trim()).toBe('Acciones');
+    const button = fixture.nativeElement.querySelector('[data-edit]');
+    expect(button.getAttribute('aria-label')).toBe('Editar Patient');
     const edit = jasmine.createSpy(); fixture.componentInstance.edit.subscribe(edit);
-    fixture.nativeElement.querySelector('[data-edit]').click();
+    button.click();
     expect(edit).toHaveBeenCalledOnceWith('patient-id');
-  });});
+  });
+});
