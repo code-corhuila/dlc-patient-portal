@@ -5,7 +5,7 @@ import { documentKey, planPatientUpdate, UpdateResult } from './patient-update-d
 import { PATIENT_FIXTURES } from './patients.mock';
 import type { PatientsPort, RegistrationResult } from './patients.port';
 import { canDeactivateDemo, DeactivatePatientRequest, DemoActor,
-  demoDeactivationError, DemoDeactivationRecord, DemoDeactivationResult } from '../model/patient-deactivation';
+  demoDeactivationError, DemoDeactivationRecord, DemoDeactivationResult, DemoHistoryResult } from '../model/patient-deactivation';
 import { DemoDeactivationGuards } from './demo-deactivation-guards';
 
 @Injectable({ providedIn: 'root' })
@@ -14,8 +14,8 @@ export class PatientsMockService implements PatientsPort {
   private patients: Patient[] = structuredClone([...PATIENT_FIXTURES]);
   private readonly changes = new BehaviorSubject(this.patients);
   private readonly deactivations = new Map<string, DemoDeactivationRecord[]>();
-  getDeactivationHistory(id: string, actor: DemoActor): DemoDeactivationRecord[] {
-    return canDeactivateDemo(actor) ? structuredClone(this.deactivations.get(id) ?? []) : [];
+  getDeactivationHistory(id: string, actor: DemoActor): DemoHistoryResult {
+    return canDeactivateDemo(actor) ? { ok: true, records: structuredClone(this.deactivations.get(id) ?? []) } : { ok: false, error: 'FORBIDDEN' };
   }
   deactivatePatient(id: string, request: DeactivatePatientRequest, actor: DemoActor): DemoDeactivationResult {
     const patient = this.patients.find(candidate => candidate.id === id);

@@ -7,7 +7,7 @@ import { createPatientCreationForm, toPatientCreationRequest } from '../../compo
 @Component({
   selector: 'app-patient-registration', standalone: true, imports: [ReactiveFormsModule],
   templateUrl: './patient-registration.component.html',
-  styleUrls: ['../../components/patient-form/patient-modal.css', './patient-registration.component.css'],
+  styleUrls: ['../../shared/styles/patient-modal.css', './patient-registration.component.css'],
 })
 export class PatientRegistrationComponent {
   @ViewChild('leaveDialog') private leaveDialog?: ElementRef<HTMLDialogElement>;

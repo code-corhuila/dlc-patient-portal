@@ -45,7 +45,7 @@
     @for (record of deactivationHistory; track $index) {
       <p>{{ record.at }} — {{ record.actorId }} — {{ record.reason }} — versión previa {{ record.previousVersion }}</p>
     }
-    @if (selectedPatient.status === 'INACTIVE' && !deactivationHistory.length) { <p>Sin historial de desactivación registrado en esta demo.</p> }
+    @if (selectedPatient.status === 'INACTIVE' && !deactivationHistory.length && !deactivationFailure) { <p>Sin historial de desactivación registrado en esta demo.</p> }
   }
   @if (deactivationFailure) { <p role="alert">{{ deactivationFailure }}</p> }
   <footer class="pat-actions">

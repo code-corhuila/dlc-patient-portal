@@ -22,7 +22,7 @@ import { canDeactivateDemo, DemoActor, DemoDeactivationRecord } from '../../mode
   standalone: true,
   imports: [PatientListComponent],
   templateUrl: './patients-page.component.html',
-  styleUrls: ['./patients-page.component.css', '../../components/patient-form/patient-modal.css'],
+  styleUrls: ['./patients-page.component.css', '../../shared/styles/patient-modal.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PatientsPageComponent implements OnInit {
@@ -51,7 +51,7 @@ export class PatientsPageComponent implements OnInit {
     try {
       this.selectedPatient = this.patientsService.getPatient(id);
       if (!this.selectedPatient) this.deactivationFailure = 'Paciente no encontrado.';
-      else this.deactivationHistory = this.patientsService.getDeactivationHistory(id, this.actor!);
+      else this.readHistory(id);
     } catch { this.deactivationFailure = 'La demo no pudo cargar el paciente.'; }
     this.deactivationDialog?.nativeElement.showModal(); this.changeDetector.markForCheck();
   }
@@ -63,8 +63,8 @@ export class PatientsPageComponent implements OnInit {
         { reason: this.reason, expectedVersion: this.selectedPatient.version }, this.actor!);
       if (result.ok) {
         this.selectedPatient = this.patientsService.getPatient(id);
-        this.deactivationHistory = this.patientsService.getDeactivationHistory(id, this.actor!);
         this.reason = ''; this.deactivationFailure = '';
+        this.readHistory(id);
       } else this.deactivationFailure = ({ FORBIDDEN: 'Operación no permitida.',
         INVALID_REQUEST: 'Ingresa un motivo de 1 a 1000 caracteres.', NOT_FOUND: 'Paciente no encontrado.',
         STALE_VERSION: 'El paciente cambió. Cierra y vuelve a abrir el diálogo.',
@@ -77,6 +77,11 @@ export class PatientsPageComponent implements OnInit {
   closeDeactivation(): void {
     this.deactivationDialog?.nativeElement.close(); this.selectedPatient = undefined;
     this.reason = ''; this.deactivationFailure = ''; this.deactivationHistory = [];
+  }
+  private readHistory(id: string): void {
+    const result = this.patientsService.getDeactivationHistory(id, this.actor!);
+    this.deactivationHistory = result.ok ? result.records : [];
+    if (!result.ok) this.deactivationFailure = 'Acceso al historial denegado.';
   }
   readonly edit = output<string>();
 

@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { CreatePatientRequest, Patient, UpdatePatientRequest } from '../model/patient';
 import { UpdateResult } from './patient-update-demo';
 import { PatientsMockService } from './patients-mock.service';
-import { DeactivatePatientRequest, DemoActor, DemoDeactivationRecord, DemoDeactivationResult } from '../model/patient-deactivation';
+import { DeactivatePatientRequest, DemoActor, DemoHistoryResult, DemoDeactivationResult } from '../model/patient-deactivation';
 
 export type RegistrationResult = { ok: true; patient: Patient } | { ok: false; error: 'DOCUMENT_EXISTS' };
 export interface PatientsPort {
@@ -12,7 +12,7 @@ export interface PatientsPort {
   register(request: CreatePatientRequest): RegistrationResult;
   updatePatient(id: string, request: UpdatePatientRequest): UpdateResult;
   deactivatePatient(id: string, request: DeactivatePatientRequest, actor: DemoActor): DemoDeactivationResult;
-  getDeactivationHistory(id: string, actor: DemoActor): DemoDeactivationRecord[];
+  getDeactivationHistory(id: string, actor: DemoActor): DemoHistoryResult;
 }
 // Explicit in-memory demo binding. Owner HTTP integration requires a separate asynchronous port/adapter.
 export const PATIENTS_PORT = new InjectionToken<PatientsPort>('patient.demo-data', {

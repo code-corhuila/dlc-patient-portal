@@ -71,4 +71,11 @@ describe('Dummy deactivation dialog', () => {
     expect(component.deactivationFailure).toContain('no pudo cargar');
     component.closeDeactivation();
   });
+  it('distinguishes denied history from an empty history', () => {
+    const fixture = render();
+    spyOn(TestBed.inject(PatientsMockService), 'getDeactivationHistory').and.returnValue({ ok: false, error: 'FORBIDDEN' });
+    fixture.componentInstance.openDeactivation(PATIENT_FIXTURES[2].id); fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Acceso al historial denegado');
+    expect(fixture.nativeElement.textContent).not.toContain('Sin historial de desactivación');
+  });
 });
