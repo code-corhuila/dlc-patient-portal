@@ -152,7 +152,7 @@ describe('HU-PAT-001 composed dummy navigation and session', () => {
     input.dispatchEvent(new Event('input'));
     fixture.detectChanges();
     const pending: Promise<boolean> = fixture.componentInstance.canLeave();
-    const dialog = fixture.nativeElement.shadowRoot.querySelector('dialog');
+    const dialog = fixture.nativeElement.shadowRoot.querySelector('app-patient-registration dialog');
     expect(dialog.open).toBeTrue();
     dialog.querySelector('button').click();
     expect(await pending).toBeFalse();
@@ -171,7 +171,7 @@ describe('HU-PAT-001 composed dummy navigation and session', () => {
   it('opens editing over the list and delegates dirty leave to the reusable form', async () => {
     context = { ...context, route: { ...context.route, localPath: '/profiles/' + patient.id + '/edit' } };
     TestBed.overrideProvider(PORTAL_CONTEXT, { useValue: context });
-    TestBed.overrideProvider(PatientsMockService, { useValue: new PatientsMockService() });
+    TestBed.overrideProvider(PatientsMockService, { useFactory: () => new PatientsMockService() });
     render(); const root = fixture.nativeElement.shadowRoot;
     expect(root.querySelector('table')).not.toBeNull(); expect(root.querySelector('dialog[open]')).not.toBeNull();
     const input = root.querySelector('#patient-name'); input.value = 'Unsaved'; input.dispatchEvent(new Event('input'));

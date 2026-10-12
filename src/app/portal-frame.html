@@ -18,6 +18,7 @@
     </section>
   } @else if (route().localPath === '/' || route().localPath === '/new' || editId()) {
     <app-patients-page [search]="route().query['q']?.[0] ?? ''" [editable]="true"
+      [deactivationActor]="route().localPath === '/' ? session().user ?? undefined : undefined"
       (add)="navigate('/app/patients/new')" (edit)="editPatient($event)" />
     @if (route().localPath === '/new') {
       <app-patient-registration (registered)="returnToPatients()" (cancelled)="returnToPatients()" />
