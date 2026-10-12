@@ -27,5 +27,31 @@
 
   <app-patient-list
     [patients]="visiblePatients" [editable]="editable" (edit)="edit.emit($event)"
+    [deactivatable]="canDeactivate" (deactivate)="openDeactivation($event)"
   />
 </main>
+<dialog #deactivationDialog data-deactivation-dialog class="modal deactivation-dialog" aria-labelledby="deactivation-title"
+  (cancel)="$event.preventDefault(); closeDeactivation()">
+  <h2 id="deactivation-title">Desactivación e historial</h2>
+  @if (selectedPatient) {
+    <p>{{ selectedPatient.name }} — {{ selectedPatient.status === 'ACTIVE' ? 'Activo' : 'Inactivo' }}</p>
+    <p>Demo local: la guarda de citas es ficticia. Se conservan los datos del paciente.</p>
+    @if (selectedPatient.status === 'ACTIVE') {
+      <label for="deactivation-reason">Motivo obligatorio (máximo 1000 caracteres)
+        <textarea id="deactivation-reason" maxlength="1000" required [value]="reason" #reasonInput
+          (input)="reason = reasonInput.value"></textarea>
+      </label>
+    }
+    @for (record of deactivationHistory; track $index) {
+      <p>{{ record.at }} — {{ record.actorId }} — {{ record.reason }} — versión previa {{ record.previousVersion }}</p>
+    }
+    @if (selectedPatient.status === 'INACTIVE' && !deactivationHistory.length) { <p>Sin historial de desactivación registrado en esta demo.</p> }
+  }
+  @if (deactivationFailure) { <p role="alert">{{ deactivationFailure }}</p> }
+  <footer class="pat-actions">
+    <button class="secondary-button" type="button" (click)="closeDeactivation()">Cerrar</button>
+    @if (selectedPatient?.status === 'ACTIVE') {
+      <button class="primary-button" type="button" (click)="confirmDeactivation()">Confirmar desactivación</button>
+    }
+  </footer>
+</dialog>

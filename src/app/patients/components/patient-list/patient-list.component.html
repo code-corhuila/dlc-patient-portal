@@ -12,7 +12,7 @@
             <th scope="col">Correo</th>
             <th scope="col">Fecha nac.</th>
             <th scope="col">Estado</th>
-            @if (editable) { <th scope="col">Acciones</th> }
+            @if (editable || deactivatable) { <th scope="col">Acciones</th> }
           </tr>
         </thead>
 
@@ -43,13 +43,19 @@
                   [class.status-inactive]="patient.status === 'INACTIVE'"
                 >{{ patient.status === 'ACTIVE' ? 'Activo' : 'Inactivo' }}</span>
               </td>
-              @if (editable) {
+              @if (editable || deactivatable) {
                 <td>
+                  @if (editable) {
                   <button class="icon-button" type="button" data-edit [attr.aria-label]="'Editar ' + patient.name"
                     title="Editar" (click)="edit.emit(patient.id)">
                     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor"
                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                   </button>
+                  }
+                  @if (deactivatable) {
+                    <button class="deactivation-button" type="button" data-deactivate [attr.aria-label]="(patient.status === 'ACTIVE' ? 'Desactivar ' : 'Historial de ') + patient.name"
+                      (click)="deactivate.emit(patient.id)">{{ patient.status === 'ACTIVE' ? 'Desactivar' : 'Historial' }}</button>
+                  }
                 </td>
               }
             </tr>
