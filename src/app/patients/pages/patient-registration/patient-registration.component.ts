@@ -1,45 +1,28 @@
-import { Component, DestroyRef, ElementRef, EventEmitter, inject, Output, signal, ViewChild } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { PatientsMockService } from '../../data/patients-mock.service';
-import { CONTACT_FIELDS, DOCUMENT_TYPE_SUGGESTIONS, FIELD_PLACEHOLDERS, PROFILE_FIELDS, WIDE_FIELDS } from '../../components/patient-form/patient-form-layout';
-import { createPatientCreationForm, toPatientCreationRequest } from '../../components/patient-form/patient-creation-form';
+import { Component, DestroyRef, ViewChild, inject, output, signal } from '@angular/core';
+import { PatientFormComponent } from '../../components/patient-form/patient-form.component';
+import { PATIENTS_PORT } from '../../data/patients.port';
+import { CreatePatientRequest } from '../../model/patient';
 
 @Component({
-  selector: 'app-patient-registration', standalone: true, imports: [ReactiveFormsModule],
+  selector: 'app-patient-registration', standalone: true, imports: [PatientFormComponent],
   templateUrl: './patient-registration.component.html',
-  styleUrls: ['../../components/patient-form/patient-modal.css', './patient-registration.component.css'],
+  styleUrls: ['../../shared/styles/patient-modal.css', './patient-registration.component.css'],
 })
 export class PatientRegistrationComponent {
-  @ViewChild('leaveDialog') private leaveDialog?: ElementRef<HTMLDialogElement>;
-  private leaveDecision?: (allowed: boolean) => void;
-  private readonly store = inject(PatientsMockService);
-  readonly profileFields = PROFILE_FIELDS;
-  readonly contactFields = CONTACT_FIELDS;
-  readonly wideFields = WIDE_FIELDS;
-  readonly placeholders = FIELD_PLACEHOLDERS;
-  readonly documentTypes = DOCUMENT_TYPE_SUGGESTIONS;
-  readonly submitted = signal(false);
+  @ViewChild(PatientFormComponent) private formComponent?: PatientFormComponent;
+  private readonly patients = inject(PATIENTS_PORT);
+  private alive = true;
   readonly saved = signal(false);
   readonly error = signal('');
-  @Output() readonly registered = new EventEmitter<void>();
-  @Output() readonly cancelled = new EventEmitter<void>();
-  readonly form = createPatientCreationForm();
+  readonly registered = output<void>();
+  readonly cancelled = output<void>();
 
-  constructor() { inject(DestroyRef).onDestroy(() => this.decideLeave(false)); }
+  constructor() { inject(DestroyRef).onDestroy(() => { this.alive = false; }); }
 
-  submit(): void {
-    if (this.saved()) return;
-    Object.values(this.form.controls).forEach(control => control.setValue(control.value.trim()));
-    this.submitted.set(true);
-    this.form.markAllAsTouched();
-    if (this.form.invalid) {
-      this.error.set(this.form.hasError('emergencyContact') ? 'Completa todos los datos del contacto de emergencia o déjalos vacíos.' :
-        'Revisa los campos obligatorios, sus límites y que la fecha de nacimiento sea pasada.');
-      return;
-    }
-    const request = toPatientCreationRequest(this.form.getRawValue());
+  save(request: CreatePatientRequest): void {
+    if (!this.alive || this.saved()) return;
     try {
-      const result = this.store.register(request);
+      const result = this.patients.register(request);
       if (!result.ok) { this.error.set('Un paciente con este documento ya existe en la demo.'); return; }
       this.error.set('');
       this.saved.set(true);
@@ -48,17 +31,6 @@ export class PatientRegistrationComponent {
   }
 
   canLeave(): Promise<boolean> {
-    if (!this.form.dirty || this.saved()) return Promise.resolve(true);
-    if (this.leaveDecision) return Promise.resolve(false);
-    return new Promise(resolve => {
-      this.leaveDecision = resolve;
-      this.leaveDialog!.nativeElement.showModal();
-    });
-  }
-
-  decideLeave(allowed: boolean): void {
-    this.leaveDialog?.nativeElement.close();
-    this.leaveDecision?.(allowed);
-    this.leaveDecision = undefined;
+    return this.saved() ? Promise.resolve(true) : this.formComponent?.canLeave() ?? Promise.resolve(true);
   }
 }

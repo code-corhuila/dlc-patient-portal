@@ -5,7 +5,7 @@ import { CreatePatientRequest, Patient } from '../../model/patient';
 import { patientEditRequest } from '../../model/patient-edit-request';
 
 @Component({ selector: 'app-patient-edit', standalone: true, imports: [PatientFormComponent],
-  templateUrl: './patient-edit.component.html', styleUrl: '../../components/patient-form/patient-modal.css' })
+  templateUrl: './patient-edit.component.html', styleUrl: '../../shared/styles/patient-modal.css' })
 export class PatientEditComponent implements OnChanges, AfterViewInit {
   @Input() patientId = '';
   @Input() allowed = false;

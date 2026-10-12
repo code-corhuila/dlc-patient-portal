@@ -18,6 +18,8 @@ import { PatientListItem, toPatientListItem } from '../../model/patient-list-ite
 export class PatientListComponent {
   rows: PatientListItem[] = [];
   @Input() editable = false;
+  @Input() deactivatable = false;
+  readonly deactivate = output<string>();
   readonly edit = output<string>();
 
   @Input() set patients(patients: PatientView[]) {

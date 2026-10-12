@@ -46,7 +46,7 @@ describe('PatientsMockService', () => {
     service.getPatients().subscribe(patients => {
       expect(patients.find(p => p.id === result.patient.id)?.name).toBe(request.name);
     });
-    new PatientsMockService().getPatients().subscribe(patients => {
+    TestBed.runInInjectionContext(() => new PatientsMockService()).getPatients().subscribe(patients => {
       expect(patients.some(p => p.documentNumber === request.documentNumber)).toBeFalse();
     });
   });
