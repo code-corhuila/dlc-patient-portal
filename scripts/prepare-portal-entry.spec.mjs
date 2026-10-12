@@ -15,9 +15,10 @@ test('C03: composed build cannot reach standalone routing or the fictional Admin
     if (visited.has(path.href)) return;
     visited.add(path.href);
     const source = await readFile(path, 'utf8');
+    if (path.pathname.endsWith('.json')) { JSON.parse(source); return; }
     assert.doesNotMatch(source, /@angular\/router|patient-demo|app\.config|app\.routes|patients\.routes/);
     for (const [, dependency] of source.matchAll(/(?:from\s*|import\s*\()\s*['"](\.[^'"]+)['"]/g)) {
-      await inspect(new URL(dependency + '.ts', path));
+      await inspect(new URL(dependency + (dependency.endsWith('.json') ? '' : '.ts'), path));
     }
   }
   await inspect(new URL('../src/portal-entry.ts', import.meta.url));

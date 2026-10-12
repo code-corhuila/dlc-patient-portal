@@ -8,7 +8,7 @@ import { CONTACT_FIELDS, DOCUMENT_TYPE_SUGGESTIONS, FIELD_PLACEHOLDERS, PROFILE_
 const requiredText: ValidatorFn = control => String(control.value).trim() ? null : { required: true };
 @Component({
   selector: 'app-patient-form', standalone: true, imports: [ReactiveFormsModule],
-  templateUrl: './patient-form.component.html', styleUrl: './patient-modal.css', changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './patient-form.component.html', styleUrl: '../../shared/styles/patient-modal.css', changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PatientFormComponent {
   private readonly core = createPatientCreationForm();

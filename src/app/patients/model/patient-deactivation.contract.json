@@ -1,0 +1,13 @@
+{
+  "sourceRevision": "638e4f227c318b9e62bc1ce5a152c71414c72d51",
+  "sourcePath": "07-api/contracts/openapi/patients-service.yaml#/paths/~1patients~1{id}~1deactivations/post",
+  "roles": ["ADMINISTRATOR"],
+  "request": {
+    "type": "object", "additionalProperties": false,
+    "properties": {
+      "reason": { "type": "string", "minLength": 1, "maxLength": 1000 },
+      "expectedVersion": { "type": "integer", "minimum": 1 }
+    },
+    "required": ["reason", "expectedVersion"]
+  }
+}

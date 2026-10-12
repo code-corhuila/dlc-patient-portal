@@ -6,6 +6,8 @@ import {
   DestroyRef,
   inject,
   Input,
+  ElementRef,
+  ViewChild,
   output,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -13,13 +15,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PatientListComponent } from '../../components/patient-list/patient-list.component';
 import { PATIENTS_PORT } from '../../data/patients.port';
 import { Patient } from '../../model/patient';
+import { canDeactivateDemo, DemoActor, DemoDeactivationRecord } from '../../model/patient-deactivation';
 
 @Component({
   selector: 'app-patients-page',
   standalone: true,
   imports: [PatientListComponent],
   templateUrl: './patients-page.component.html',
-  styleUrl: './patients-page.component.css',
+  styleUrls: ['./patients-page.component.css', '../../shared/styles/patient-modal.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PatientsPageComponent implements OnInit {
@@ -31,6 +34,55 @@ export class PatientsPageComponent implements OnInit {
   // The shell's `q` seeds the toolbar search; local typing refines it.
   @Input() set search(value: string) { this.query = value; }
   @Input() editable = false;
+  private actor?: DemoActor;
+  @Input() set deactivationActor(value: DemoActor | undefined) {
+    if (this.actor?.id !== value?.id || !canDeactivateDemo(value)) this.closeDeactivation();
+    this.actor = value;
+  }
+  get canDeactivate(): boolean { return canDeactivateDemo(this.actor); }
+  @ViewChild('deactivationDialog') private deactivationDialog?: ElementRef<HTMLDialogElement>;
+  selectedPatient?: Patient;
+  reason = '';
+  deactivationFailure = '';
+  deactivationHistory: DemoDeactivationRecord[] = [];
+  openDeactivation(id: string): void {
+    if (!this.canDeactivate) return;
+    this.closeDeactivation();
+    try {
+      this.selectedPatient = this.patientsService.getPatient(id);
+      if (!this.selectedPatient) this.deactivationFailure = 'Paciente no encontrado.';
+      else this.readHistory(id);
+    } catch { this.deactivationFailure = 'La demo no pudo cargar el paciente.'; }
+    this.deactivationDialog?.nativeElement.showModal(); this.changeDetector.markForCheck();
+  }
+  confirmDeactivation(): void {
+    if (!this.canDeactivate || !this.selectedPatient) return;
+    try {
+      const id = this.selectedPatient.id;
+      const result = this.patientsService.deactivatePatient(id,
+        { reason: this.reason, expectedVersion: this.selectedPatient.version }, this.actor!);
+      if (result.ok) {
+        this.selectedPatient = this.patientsService.getPatient(id);
+        this.reason = ''; this.deactivationFailure = '';
+        this.readHistory(id);
+      } else this.deactivationFailure = ({ FORBIDDEN: 'Operación no permitida.',
+        INVALID_REQUEST: 'Ingresa un motivo de 1 a 1000 caracteres.', NOT_FOUND: 'Paciente no encontrado.',
+        STALE_VERSION: 'El paciente cambió. Cierra y vuelve a abrir el diálogo.',
+        PATIENT_ALREADY_INACTIVE: 'El paciente ya está inactivo.',
+        PATIENT_DEACTIVATION_BLOCKED: 'Desactivación bloqueada por la guarda ficticia de citas.',
+        GUARD_UNAVAILABLE: 'No se pudo verificar la guarda ficticia; el paciente permanece activo.' })[result.error];
+    } catch { this.deactivationFailure = 'La demo no pudo desactivar el paciente.'; }
+    this.changeDetector.markForCheck();
+  }
+  closeDeactivation(): void {
+    this.deactivationDialog?.nativeElement.close(); this.selectedPatient = undefined;
+    this.reason = ''; this.deactivationFailure = ''; this.deactivationHistory = [];
+  }
+  private readHistory(id: string): void {
+    const result = this.patientsService.getDeactivationHistory(id, this.actor!);
+    this.deactivationHistory = result.ok ? result.records : [];
+    if (!result.ok) this.deactivationFailure = 'Acceso al historial denegado.';
+  }
   readonly edit = output<string>();
 
   get visiblePatients(): Patient[] {
