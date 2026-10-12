@@ -147,7 +147,7 @@ describe('HU-PAT-001 composed dummy navigation and session', () => {
     const modal = fixture.nativeElement.shadowRoot.querySelector('[role=dialog][aria-modal=true]');
     expect(modal.textContent).toContain('Registrar Nuevo Paciente');
     expect(fixture.nativeElement.shadowRoot.querySelector('table')).not.toBeNull();
-    const input = fixture.nativeElement.shadowRoot.querySelector('#pat-name');
+    const input = fixture.nativeElement.shadowRoot.querySelector('#patient-name');
     input.value = 'Unsaved demo';
     input.dispatchEvent(new Event('input'));
     fixture.detectChanges();
