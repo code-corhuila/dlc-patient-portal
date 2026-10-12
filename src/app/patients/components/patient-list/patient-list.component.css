@@ -127,6 +127,21 @@ tbody tr:hover td {
   color: var(--pat-primary);
 }
 
+.deactivation-button {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--pat-primary);
+  border-radius: 8px;
+  background: var(--pat-primary);
+  color: #fff;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.deactivation-button:hover { filter: brightness(0.92); }
+.deactivation-button:focus-visible { outline: 2px solid var(--pat-primary); outline-offset: 3px; }
+
 .empty {
   margin: 0;
   padding: 2.5rem 1.5rem;
