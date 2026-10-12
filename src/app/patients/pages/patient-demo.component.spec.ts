@@ -3,8 +3,21 @@ import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { routes } from '../../app.routes';
 import { PATIENT_FIXTURES } from '../data/patients.mock';
+import { By } from '@angular/platform-browser';
+import { PatientFormComponent } from '../components/patient-form/patient-form.component';
 
 describe('Standalone patient editing harness', () => {
+  it('creates through the shared form and returns to the list without a discard prompt', async () => {
+    TestBed.configureTestingModule({ providers: [provideRouter(routes)] });
+    const harness = await RouterTestingHarness.create('/patient/new');
+    const child = harness.fixture.debugElement.query(By.directive(PatientFormComponent)).componentInstance as PatientFormComponent;
+    child.form.patchValue({ documentType: 'CC', documentNumber: '2000000009', name: 'Created Demo',
+      birthDate: '1990-01-15', phone: '300', email: 'created@example.com' }); child.form.markAsDirty();
+    child.submit(); await harness.fixture.whenStable(); harness.detectChanges();
+    expect(TestBed.inject(Router).url).toBe('/patient');
+    expect(harness.routeNativeElement!.textContent).toContain('Created Demo');
+    expect(harness.routeNativeElement!.querySelector('app-patient-registration')).toBeNull();
+  });
   it('opens the selected patient, saves a phone edit and returns to the updated list', async () => {
     TestBed.configureTestingModule({ providers: [provideRouter(routes)] });
     const harness = await RouterTestingHarness.create('/patient');
