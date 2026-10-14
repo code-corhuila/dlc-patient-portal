@@ -1,0 +1,10 @@
+<dialog class="modal" #modal aria-label="Editar Paciente" (cancel)="$event.preventDefault(); finished.emit()">
+  @if (allowed && patient) {
+    <app-patient-form mode="edit" title="Editar Paciente" [initialValue]="patient" [failure]="failure"
+      [busy]="busy" [saved]="saved" (save)="save($event)" (cancel)="finished.emit()" />
+  } @else {
+    <p class="form-error" role="alert">{{ failure }}</p>
+    <div class="pat-actions"><button class="secondary-button" type="button" (click)="finished.emit()">Volver a pacientes</button></div>
+  }
+  @if (conflict) { <div class="pat-actions"><button class="primary-button" type="button" (click)="reload()">Recargar paciente</button></div> }
+</dialog>

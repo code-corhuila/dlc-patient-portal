@@ -1,0 +1,6 @@
+<div class="modal-backdrop">
+  <section class="modal" role="dialog" aria-modal="true" aria-label="Registrar Nuevo Paciente">
+    <app-patient-form mode="create" title="Registrar Nuevo Paciente" [saved]="saved()" [failure]="error()"
+      (save)="save($event)" (cancel)="cancelled.emit()" />
+  </section>
+</div>

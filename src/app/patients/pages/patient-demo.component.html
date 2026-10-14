@@ -1,0 +1,5 @@
+<p>Standalone fictional Administrator demo.</p>
+<button type="button" (click)="add()">Register patient</button>
+<app-patients-page [editable]="true" (edit)="edit($event)" />
+@if (creation) { <app-patient-registration (registered)="finish()" (cancelled)="finish()" /> }
+@if (editingId()) { <app-patient-edit [patientId]="editingId()!" [allowed]="true" (finished)="finish()" /> }

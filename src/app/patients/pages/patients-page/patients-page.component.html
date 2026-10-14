@@ -1,0 +1,57 @@
+<main class="patients-page">
+  <header class="page-header">
+    <div>
+      <h1>Gestión de Pacientes</h1>
+      <p>Registro y consulta de expedientes de pacientes en el Consultorio Dental DI-LUCCA</p>
+      <span class="demo-notice">Datos ficticios de demostración</span>
+    </div>
+    <button class="primary-button" type="button" data-new-patient (click)="add.emit()">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" d="M15 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M8.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM19 8v6M22 11h-6"/></svg>
+      Nuevo Paciente
+    </button>
+  </header>
+
+  <section class="toolbar" aria-label="Filtros de pacientes">
+    <label class="search">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" d="m21 21-4.3-4.3M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z"/></svg>
+      <input type="search" aria-label="Buscar pacientes" placeholder="Buscar por nombre, apellido o número de documento..."
+        [value]="query" (input)="query = $any($event.target).value" />
+    </label>
+    <label class="toggle">
+      <input type="checkbox" [checked]="onlyActive" (change)="onlyActive = $any($event.target).checked" />
+      <span>Solo Pacientes Activos</span>
+    </label>
+  </section>
+
+  <app-patient-list
+    [patients]="visiblePatients" [editable]="editable" (edit)="edit.emit($event)"
+    [deactivatable]="canDeactivate" (deactivate)="openDeactivation($event)"
+  />
+</main>
+<dialog #deactivationDialog data-deactivation-dialog class="modal deactivation-dialog" aria-labelledby="deactivation-title"
+  (cancel)="$event.preventDefault(); closeDeactivation()">
+  <h2 id="deactivation-title">Desactivación e historial</h2>
+  @if (selectedPatient) {
+    <p>{{ selectedPatient.name }} — {{ selectedPatient.status === 'ACTIVE' ? 'Activo' : 'Inactivo' }}</p>
+    <p>Demo local: la guarda de citas es ficticia. Se conservan los datos del paciente.</p>
+    @if (selectedPatient.status === 'ACTIVE') {
+      <label for="deactivation-reason">Motivo obligatorio (máximo 1000 caracteres)
+        <textarea id="deactivation-reason" maxlength="1000" required [value]="reason" #reasonInput
+          (input)="reason = reasonInput.value"></textarea>
+      </label>
+    }
+    @for (record of deactivationHistory; track $index) {
+      <p>{{ record.at }} — {{ record.actorId }} — {{ record.reason }} — versión previa {{ record.previousVersion }}</p>
+    }
+    @if (selectedPatient.status === 'INACTIVE' && !deactivationHistory.length && !deactivationFailure) { <p>Sin historial de desactivación registrado en esta demo.</p> }
+  }
+  @if (deactivationFailure) { <p role="alert">{{ deactivationFailure }}</p> }
+  <footer class="pat-actions">
+    <button class="secondary-button" type="button" (click)="closeDeactivation()">Cerrar</button>
+    @if (selectedPatient?.status === 'ACTIVE') {
+      <button class="primary-button" type="button" (click)="confirmDeactivation()">Confirmar desactivación</button>
+    }
+  </footer>
+</dialog>

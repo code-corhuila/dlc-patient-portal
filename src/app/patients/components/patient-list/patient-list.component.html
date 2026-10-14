@@ -1,0 +1,67 @@
+<section class="patient-list">
+  @if (rows.length === 0) {
+    <p class="empty">No se encontraron pacientes.</p>
+  } @else {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Paciente</th>
+            <th scope="col">Documento</th>
+            <th scope="col">Teléfono</th>
+            <th scope="col">Correo</th>
+            <th scope="col">Fecha nac.</th>
+            <th scope="col">Estado</th>
+            @if (editable || deactivatable) { <th scope="col">Acciones</th> }
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (patient of rows; track patient.id) {
+            <tr>
+              <td>
+                <div class="patient-cell">
+                  <span class="avatar" data-avatar aria-hidden="true">{{ patient.initials }}</span>
+                  <div>
+                    <span class="name" data-name>{{ patient.name }}</span>
+                    @if (patient.address) { <span class="address" data-address>{{ patient.address }}</span> }
+                  </div>
+                </div>
+              </td>
+              <td>
+                @if (patient.documentNumber) {
+                  <span class="chip" data-document-type>{{ patient.documentType }}</span>
+                  <span class="document" data-document-number>{{ patient.documentNumber }}</span>
+                } @else { — }
+              </td>
+              <td>{{ patient.phone ?? '—' }}</td>
+              <td>{{ patient.email ?? '—' }}</td>
+              <td>{{ patient.birthDate ?? '—' }}</td>
+              <td>
+                <span class="status" data-status
+                  [class.status-active]="patient.status === 'ACTIVE'"
+                  [class.status-inactive]="patient.status === 'INACTIVE'"
+                >{{ patient.status === 'ACTIVE' ? 'Activo' : 'Inactivo' }}</span>
+              </td>
+              @if (editable || deactivatable) {
+                <td>
+                  @if (editable) {
+                  <button class="icon-button" type="button" data-edit [attr.aria-label]="'Editar ' + patient.name"
+                    title="Editar" (click)="edit.emit(patient.id)">
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor"
+                      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                  </button>
+                  }
+                  @if (deactivatable) {
+                    <button class="deactivation-button" type="button" data-deactivate [attr.aria-label]="(patient.status === 'ACTIVE' ? 'Desactivar ' : 'Historial de ') + patient.name"
+                      (click)="deactivate.emit(patient.id)">{{ patient.status === 'ACTIVE' ? 'Desactivar' : 'Historial' }}</button>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
