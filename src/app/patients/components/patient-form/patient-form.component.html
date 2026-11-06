@@ -65,7 +65,7 @@
       <p class="form-error" role="alert">Completa el nombre, parentesco y teléfono del contacto de emergencia.</p>
     }
     @if (failure) { <p class="form-error" role="alert">{{ failure }}</p> }
-    @if (saved) { <p class="form-success" role="status">Cambios guardados en esta demo local.</p> }
+    @if (saved) { <p class="form-success" role="status">{{ successMessage }}</p> }
     <footer class="pat-actions">
       <button class="secondary-button cancel-button" type="button" [disabled]="busy" (click)="cancel.emit()">Cancelar</button>
       <button class="primary-button save-button" type="submit" [disabled]="saved || busy">Guardar Paciente</button>

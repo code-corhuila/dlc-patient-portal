@@ -1,5 +1,6 @@
 import { Component, computed, DestroyRef, inject, signal, ViewChild, ViewEncapsulation } from '@angular/core';
 import { PatientEditComponent } from './patients/pages/patient-edit/patient-edit.component';
+import { PatientsApiPage, hasPatientHttp } from './patients/pages/patients-api-page';
 import { PORTAL_CONTEXT } from './shell-contract';
 import { PatientsPageComponent } from './patients/pages/patients-page/patients-page.component';
 import { PatientRegistrationComponent } from './patients/pages/patient-registration/patient-registration.component';
@@ -7,16 +8,19 @@ import { PatientRegistrationComponent } from './patients/pages/patient-registrat
 @Component({
   selector: 'dlc-patient-root',
   standalone: true,
-  imports: [PatientsPageComponent, PatientRegistrationComponent, PatientEditComponent],
+  imports: [PatientsPageComponent, PatientRegistrationComponent, PatientEditComponent, PatientsApiPage],
   encapsulation: ViewEncapsulation.ShadowDom,
   templateUrl: './portal-frame.html',
   styleUrl: './portal-frame.css',
 })
 export class PortalFrame {
   @ViewChild(PatientRegistrationComponent) private registration?: PatientRegistrationComponent;
+  @ViewChild(PatientsApiPage) private apiPage?: PatientsApiPage;
   @ViewChild(PatientEditComponent) private editor?: PatientEditComponent;
   readonly editId = computed(() => /^\/profiles\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/edit$/i.exec(this.route().localPath)?.[1]);
   private readonly context = inject(PORTAL_CONTEXT);
+  readonly connected = hasPatientHttp(this.context.http);
+  readonly accessKey = computed(() => JSON.stringify([this.session().user?.id, this.session().user?.roles, this.session().permissions]));
   private alive = true;
   readonly route = signal(this.context.route);
   readonly session = signal(this.context.session.getSnapshot());
@@ -39,7 +43,7 @@ export class PortalFrame {
 
   returnToPatients(): Promise<void> { return this.navigate('/app/patients'); }
 
-  canLeave(): Promise<boolean> { return this.editor?.canLeave() ?? this.registration?.canLeave() ?? Promise.resolve(true); }
+  canLeave(): Promise<boolean> { return this.apiPage?.canLeave() ?? this.editor?.canLeave() ?? this.registration?.canLeave() ?? Promise.resolve(true); }
 
   editPatient(id: string): Promise<void> {
     if (this.session().state !== 'authenticated' || !this.canReadAdministrativeDemo()) return Promise.resolve();

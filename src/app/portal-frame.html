@@ -10,6 +10,8 @@
         <p role="status">Inicia sesión en la aplicación para acceder a los pacientes.</p>
       }
     </section>
+  } @else if (connected) {
+    @for (key of [accessKey()]; track key) { <app-patients-api-page [route]="route()" /> }
   } @else if (!canReadAdministrativeDemo()) {
     <section class="notice">
       <h1>Gestión de Pacientes</h1>
