@@ -37,6 +37,7 @@ export class PatientFormComponent {
   @Input() title = 'Registrar Nuevo Paciente';
   @Input() failure = '';
   @Input() saved = false;
+  @Input() successMessage = 'Cambios guardados en esta demo local.';
   @Input() busy = false;
   readonly form = new FormGroup({ ...this.core.controls,
     additionalContacts: new FormArray<ReturnType<PatientFormComponent['contactGroup']>>([]),
