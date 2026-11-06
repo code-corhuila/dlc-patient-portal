@@ -1,0 +1,27 @@
+<main class="patients-page">
+  <header class="page-header"><h1>Gestión de Pacientes</h1>
+    @if (allowed('patients:register')) { <button class="primary-button" (click)="navigate('/new')">Nuevo Paciente</button> }
+  </header>
+  @if (failure()) { <p role="alert">{{ failure() }}</p><button (click)="reload()" [disabled]="saving() || busy()">Recargar</button> }
+  @if (busy()) { <p role="status">Cargando pacientes...</p> }
+  @if (!creating && !editId) {
+    <section class="toolbar" aria-label="Filtros de pacientes">
+      <label>Buscar <input type="search" [value]="query" (input)="query = $any($event.target).value" (keydown.enter)="page = 1; load()" /></label>
+      <label><input type="checkbox" [checked]="activeOnly" (change)="activeOnly = $any($event.target).checked; page = 1; load()" />Solo activos</label>
+      <button (click)="page = 1; load()" [disabled]="busy()">Buscar</button>
+    </section>
+    <app-patient-list [patients]="result().data" [editable]="allowed('patients:write')" (edit)="navigate('/profiles/' + $event + '/edit')" />
+    <nav aria-label="Páginas de pacientes">
+      <button [disabled]="busy() || page <= 1" (click)="changePage(-1)">Anterior</button>
+      <span>Página {{ page }} · {{ result().meta.total }} pacientes</span>
+      <button [disabled]="busy() || page >= result().meta.totalPages" (click)="changePage(1)">Siguiente</button>
+    </nav>
+  } @else if ((creating && allowed('patients:register')) || (editId && allowed('patients:write'))) {
+    @if (!busy() && (creating || patient())) {
+      <app-patient-form [mode]="creating ? 'create' : 'edit'" [title]="creating ? 'Registrar Nuevo Paciente' : 'Editar Paciente'"
+        [initialValue]="patient()" [busy]="saving()" [saved]="saved()" [failure]="failure()" successMessage="Cambios guardados."
+        (save)="save($event)" (cancel)="navigate('')" />
+    }
+  } @else { <p role="alert">No tienes permiso para esta operación.</p> }
+  @if (creating || editId) { <button [disabled]="saving()" (click)="navigate('')">Volver a pacientes</button> }
+</main>
