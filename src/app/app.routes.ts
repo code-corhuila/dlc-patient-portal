@@ -1,14 +1,4 @@
 import { Routes } from '@angular/router';
-import { PATIENTS_ROUTES } from './patients/patients.routes';
 
-export const routes: Routes = [
-	{
-		path: 'patient',
-		children: PATIENTS_ROUTES,
-	},
-	{
-		path: '',
-		pathMatch: 'full',
-		redirectTo: 'patient',
-	},
-];
+// The portal runs only inside dlc-front, which supplies session and HTTP; no standalone pages.
+export const routes: Routes = [];
