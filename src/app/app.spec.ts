@@ -17,11 +17,11 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should mount the patients view at /patient and redirect the root route', () => {
-    const patientRoute = routes.find(route => route.path === 'patient');
-    const rootRoute = routes.find(route => route.path === '');
+  it('offers no standalone patient pages outside the shell', () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
 
-    expect(patientRoute?.children?.[0].component).toBeDefined();
-    expect(rootRoute?.redirectTo).toBe('patient');
+    expect(routes).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain('se ejecuta dentro de dlc-front');
   });
 });
