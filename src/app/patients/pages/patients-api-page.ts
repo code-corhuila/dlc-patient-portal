@@ -14,7 +14,7 @@ export function hasPatientHttp(value: unknown): value is PatientHttp {
 }
 @Component({ selector: 'app-patients-api-page', standalone: true,
   imports: [PatientFormComponent, PatientListComponent], templateUrl: './patients-api-page.html',
-  styleUrls: ['./patients-page/patients-page.component.css', '../shared/styles/patient-modal.css', './patients-api-page.css'] })
+  styleUrls: ['./patients-list.css', '../shared/styles/patient-modal.css', './patients-api-page.css'] })
 export class PatientsApiPage implements OnChanges {
   @Input({ required: true }) route!: PortalRoute;
   @ViewChild(PatientFormComponent) form?: PatientFormComponent;
