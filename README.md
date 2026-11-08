@@ -11,15 +11,13 @@ Run `npm run build:portal` to create `dist/dlc-patient-portal/portal/browser/ent
 
 The package and Angular project use the approved component name `dlc-patient-portal`. Packaging reads its output path from Angular configuration; `npm run test:packaging` verifies that behavior. The local folder and Git remote may retain their previous plural name; this change does not rename either or publish a release.
 
-The composed frame consumes the shell session and shows an explicit fictional list for Administrator/Assistant. It accepts the shell's `q` query and delegates 404 recovery through shell navigation. Dentist assignment fixtures, owner APIs and shell registration remain pending. See [navigation evidence](docs/hu-pat-001-composition-navigation.md).
+The composed frame consumes the shell session and reads and writes patients only through the Patients API, using the shell HTTP client (`context.http`): list with server-side search, filter and pagination; registration with an idempotency key; editing with the current version. Visibility follows the IAM permissions in the session (`patients:read`, `patients:register`, `patients:write`). Without a shell HTTP client the frame shows a connection notice; the portal holds no fixture data. The standalone Angular app only states that the portal runs inside dlc-front.
 
-The `/new` local route supports administrative dummy registration, optional address/emergency contact and unsaved-change confirmation. Its store lasts only for the mounted Angular application; reload or full unmount resets it. See [registration evidence](docs/hu-pat-001-dummy-registration.md).
+## Release for dlc-front
 
-## Demo delivery for dlc-front
+From a clean checkout, run `npm run build:release` (release `1.0.0` by default), then `npm run serve:release` for versioned assets on localhost:4178. This serves `entry.js`, not a standalone page. For containers, start Docker and run `docker compose -f deploy/compose.yml up --build -d`; the service is `patient-portal`. Existing release folders are immutable; select a new release with `npm run build:release -- 1.0.1`.
 
-From a clean checkout, run `npm run build:demo`, then `npm run serve:demo` for versioned assets on localhost:4178. This serves `entry.js`, not a standalone page. For containers, start Docker and run `docker compose -f deploy/compose.yml up --build -d`. Existing release folders are immutable; select a new release with `npm run build:demo -- 0.1.1-demo`.
-
-The generated `dist/demo/patient-descriptor.json` supplies the Patients descriptor to the front team. Registry/proxy registration and browser integration remain pending in dlc-front. See [delivery contract and evidence](docs/hu-pat-001-demo-delivery.md).
+The generated `dist/release/patient-descriptor.json` supplies the Patients descriptor for the dlc-front registry. Earlier demo evidence remains in `docs/` as history.
 
 ## Local CI checks
 
