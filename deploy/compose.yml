@@ -1,12 +1,12 @@
 name: dlc-patient-portal
 services:
-  patient-portal-demo:
-    container_name: patient-portal-demo
+  patient-portal:
+    container_name: patient-portal
     build:
       context: ..
       dockerfile: deploy/Dockerfile
     ports:
-      - '${PATIENT_DEMO_PORT:-4178}:80'
+      - '${PATIENT_PORTAL_PORT:-4178}:80'
     healthcheck:
       test: ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://127.0.0.1/healthz']
       interval: 15s

@@ -16,7 +16,7 @@ function assetPath(root, url) {
   return file.startsWith(root + sep) ? file : null;
 }
 
-export function createDemoServer(directory) {
+export function createReleaseServer(directory) {
   const root = resolve(directory);
   return createServer(async (request, response) => {
     response.setHeader('Cache-Control', 'no-store');
@@ -38,9 +38,9 @@ export function createDemoServer(directory) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  const port = Number(process.env.PATIENT_DEMO_PORT ?? 4178);
+  const port = Number(process.env.PATIENT_PORTAL_PORT ?? 4178);
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('INVALID_PORT');
-  const server = createDemoServer('dist/demo');
+  const server = createReleaseServer('dist/release');
   server.listen(port, '127.0.0.1', () => console.log(`Patient assets: http://127.0.0.1:${port}/portals/patient/`));
   for (const event of ['SIGINT', 'SIGTERM']) process.once(event, () => {
     server.close(); server.closeAllConnections();

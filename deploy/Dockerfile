@@ -5,9 +5,9 @@ RUN npm ci --no-audit --no-fund
 COPY angular.json tsconfig*.json ./
 COPY src ./src
 COPY scripts ./scripts
-RUN npm run build:demo
+RUN npm run build:release
 
 FROM nginx:stable-alpine@sha256:0985e772fb9f729e6fa0980da05fca5d9c468e870eed43071545afa9d2e27d94
 COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /workspace/dist/demo/portals /usr/share/nginx/html/portals
+COPY --from=build /workspace/dist/release/portals /usr/share/nginx/html/portals
 EXPOSE 80
