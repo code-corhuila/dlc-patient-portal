@@ -5,6 +5,8 @@ Entries describe implemented behavior; they do not establish user-story acceptan
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-11-14
+
 ### Added
 
 - Patient listing, name/document search and an active-patient filter.
