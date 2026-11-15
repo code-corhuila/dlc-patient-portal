@@ -1,0 +1,44 @@
+<main class="patients-page">
+  <header class="page-header"><h1>Gestión de Pacientes</h1>
+    @if (allowed('patients:register')) { <button class="primary-button" (click)="navigate('/new')">Nuevo Paciente</button> }
+  </header>
+  @if (failure()) { <p role="alert">{{ failure() }}</p><button (click)="reload()" [disabled]="saving() || busy()">Recargar</button> }
+  @if (busy()) { <p role="status">Cargando pacientes...</p> }
+  @if (!creating && !editId) {
+    <section class="toolbar" aria-label="Filtros de pacientes">
+      <label class="search">
+        <span class="visually-hidden">Buscar pacientes por nombre o documento</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4 4" /></svg>
+        <input type="search" placeholder="Buscar por nombre o documento..." [value]="query"
+          (input)="query = $any($event.target).value" (keydown.enter)="page = 1; load()" />
+      </label>
+      <div class="filter-actions">
+        <label class="active-filter">
+          <input type="checkbox" role="switch" [checked]="activeOnly" (change)="activeOnly = $any($event.target).checked; page = 1; load()" />
+          <span>Solo activos</span>
+        </label>
+        <button class="primary-button filter-button" type="button" (click)="page = 1; load()" [disabled]="busy()">Buscar</button>
+      </div>
+    </section>
+    <app-patient-list [patients]="result().data" [editable]="allowed('patients:write')" (edit)="navigate('/profiles/' + $event + '/edit')" />
+    <nav class="pagination" aria-label="Páginas de pacientes">
+      <span class="patient-count">{{ result().meta.total }} {{ result().meta.total === 1 ? 'paciente' : 'pacientes' }}</span>
+      <div class="page-controls">
+        <button class="page-button" type="button" [disabled]="busy() || page <= 1" (click)="changePage(-1)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6" /></svg>Anterior
+        </button>
+        <span class="page-indicator" aria-live="polite">Página <strong>{{ page }}</strong> de {{ result().meta.totalPages || 1 }}</span>
+        <button class="page-button" type="button" [disabled]="busy() || page >= result().meta.totalPages" (click)="changePage(1)">
+          Siguiente<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6" /></svg>
+        </button>
+      </div>
+    </nav>
+  } @else if ((creating && allowed('patients:register')) || (editId && allowed('patients:write'))) {
+    @if (!busy() && (creating || patient())) {
+      <app-patient-form [mode]="creating ? 'create' : 'edit'" [title]="creating ? 'Registrar Nuevo Paciente' : 'Editar Paciente'"
+        [initialValue]="patient()" [busy]="saving()" [saved]="saved()" [failure]="failure()" successMessage="Cambios guardados."
+        (save)="save($event)" (cancel)="navigate('')" />
+    }
+  } @else { <p role="alert">No tienes permiso para esta operación.</p> }
+  @if (creating || editId) { <button [disabled]="saving()" (click)="navigate('')">Volver a pacientes</button> }
+</main>

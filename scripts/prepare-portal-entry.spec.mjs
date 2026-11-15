@@ -24,6 +24,13 @@ test('C03: composed build cannot reach standalone routing or the fictional Admin
   await inspect(new URL('../src/portal-entry.ts', import.meta.url));
 });
 
+test('HU-PAT-001: the portal source keeps no in-memory patient fixtures or demo data path', async () => {
+  const { readdir } = await import('node:fs/promises');
+  const files = (await readdir(new URL('../src/app', import.meta.url), { recursive: true }))
+    .map(file => file.replaceAll('\\', '/'));
+  assert.deepEqual(files.filter(file => /(^|\/)data\/|mock|demo/i.test(file)), []);
+});
+
 test('HU-PAT-001: package the entry at the configured Angular output path', async () => {
   const prefix = join(tmpdir(), 'patient-entry-');
   const workspace = await mkdtemp(prefix);

@@ -23,10 +23,11 @@ describe('HU-PAT-001 / ADR-011 mount lifecycle', () => {
       session: {
         getSnapshot: () => ({ state: 'authenticated', revision: 1,
           user: { id: 'demo-admin', name: 'Demo Administrator', roles: ['ADMINISTRATOR'] },
-          permissions: [], expiresAt: '2099-01-01T00:00:00Z', reason: null }),
+          permissions: ['patients:read'], expiresAt: '2099-01-01T00:00:00Z', reason: null }),
         subscribe: () => () => undefined,
       },
-      http: {}, reportFailure: jasmine.createSpy('reportFailure'),
+      http: { request: async () => ({ ok: true, data: { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } } }) },
+      reportFailure: jasmine.createSpy('reportFailure'),
     };
   });
 
@@ -48,13 +49,14 @@ describe('HU-PAT-001 / ADR-011 mount lifecycle', () => {
     expect(context.reportFailure).not.toHaveBeenCalled();
   });
 
-  it('renders the initial dummy frame inside the supplied host', async () => {
+  it('renders the initial API frame inside the supplied host', async () => {
     const outside = document.createElement('aside');
     document.body.append(outside);
     try {
       const handle = await open();
       const root = host.querySelector('dlc-patient-root')!;
-      expect(root.shadowRoot!.textContent).toContain('Datos ficticios de demostración');
+      expect(root.shadowRoot!.textContent).toContain('Gestión de Pacientes');
+      expect(root.shadowRoot!.textContent).not.toContain('demostración');
       expect(outside.childElementCount).toBe(0);
       expect(await handle.canLeave()).toBeTrue();
       expect(context.reportFailure).not.toHaveBeenCalled();
